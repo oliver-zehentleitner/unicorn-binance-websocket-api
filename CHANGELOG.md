@@ -10,6 +10,30 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
   [How to upgrade to the latest version!](https://oliver-zehentleitner.github.io/unicorn-binance-websocket-api/readme.html#installation-and-upgrade)
 
 ## 2.14.0.dev (development stage/unreleased/unstable)
+### Added
+- Portfolio Margin support (`binance.com-portfolio_margin` exchange), scoped
+  to the `!userData` stream for now:
+  - `connection_settings.py`: new `Exchanges.BINANCE_PORTFOLIO_MARGIN` entry
+    in `CONNECTION_SETTINGS` (`wss://fstream.binance.com/pm/`, no WS API base
+    URI yet). Deliberately excluded from `BINANCE_FUTURES_EXCHANGES` — it
+    keeps the legacy `/ws/<listenKey>` path form, not the `/private/ws?
+    listenKey=...&events=...` form used by USDⓈ-M Futures.
+  - `restclient.py`: listenKey get/keepalive/close routing to the new UBRA
+    `portfolio_margin_stream_*()` methods.
+  - New example:
+    [`binance_websocket_api_portfolio_margin`](https://github.com/oliver-zehentleitner/unicorn-binance-websocket-api/tree/master/examples/binance_websocket_api_portfolio_margin).
+  - Requires an unreleased UBRA version — see
+    [issue #452](https://github.com/oliver-zehentleitner/unicorn-binance-websocket-api/issues/452).
+    The full Portfolio Margin REST surface (account, positions, orders,
+    etc.) is out of scope for now; deferred to the planned UBRA rewrite.
+  - `restclient.py`: `_init_ubra()` now catches UBRA's `UnknownExchange` and
+    returns `False` instead of letting it propagate — before this, using an
+    exchange the installed UBRA doesn't recognize yet (as is currently the
+    case for `binance.com-portfolio_margin` until UBRA ships it) crashed the
+    calling stream thread with an uncaught exception instead of the intended
+    graceful `(None, None)` degradation. `get_listen_key()`,
+    `keepalive_listen_key()` and `delete_listen_key()` now check this return
+    value and bail out cleanly.
 
 ## 2.14.0
 ### Added

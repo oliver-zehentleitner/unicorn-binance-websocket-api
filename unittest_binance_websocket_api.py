@@ -48,6 +48,7 @@ import os
 import platform
 import time
 import threading
+from unittest.mock import Mock
 
 import tracemalloc
 tracemalloc.start(25)
@@ -804,6 +805,141 @@ class TestBinanceOptionsManager(unittest.TestCase):
         self.assertTrue(bool(stream_id))
         time.sleep(3)
         self.__class__.ubwa.stop_stream(stream_id)
+
+
+class TestBinancePortfolioMarginManager(unittest.TestCase):
+    """Tests for the `binance.com-portfolio_margin` exchange (issue #452).
+
+    Scope is currently limited to user data stream (listenKey) support - there
+    is no public market data endpoint at `/pm/` to subscribe to, so these tests
+    stay off the network by injecting a `provided_listen_key` instead of
+    talking to `restclient`.
+    """
+
+    @classmethod
+    def setUpClass(cls):
+        print(f"\r\nTestBinancePortfolioMarginManager:")
+        cls.ubwa = BinanceWebSocketApiManager(exchange="binance.com-portfolio_margin",
+                                              disable_colorama=True)
+
+    @classmethod
+    def tearDownClass(cls):
+        # `delete_listen_key=False`: the injected `provided_listen_key` in
+        # `test_create_uri_userdata_uses_pm_ws_path` is a dummy value, deleting it
+        # would trigger a real (and unwanted) REST call.
+        cls.ubwa.stop_manager(delete_listen_key=False)
+
+    def test_exchange_string(self):
+        self.assertEqual(str(self.__class__.ubwa.get_exchange()), "binance.com-portfolio_margin")
+
+    def test_is_exchange_type_cex(self):
+        self.assertTrue(self.__class__.ubwa.is_exchange_type("cex"))
+
+    def test_max_subscriptions(self):
+        self.assertEqual(self.__class__.ubwa.get_limit_of_subscriptions_per_stream(), 200)
+
+    def test_websocket_base_uri(self):
+        self.assertEqual(self.__class__.ubwa.websocket_base_uri, "wss://fstream.binance.com/pm/")
+
+    def test_websocket_api_base_uri_not_supported(self):
+        # Portfolio Margin only covers user data streams for now, no WS API.
+        self.assertIsNone(self.__class__.ubwa.websocket_api_base_uri)
+
+    def test_futures_path_prefix_is_empty(self):
+        # Portfolio Margin is NOT part of BINANCE_FUTURES_EXCHANGES: it keeps the
+        # legacy `/ws/<listenKey>` path form and must not get a /public,/market,
+        # /private category segment prepended.
+        self.assertEqual(self.__class__.ubwa._futures_path_prefix(["!userData"], ["arr"]), "")
+
+    def test_create_uri_userdata_uses_pm_ws_path(self):
+        stream_id = self.__class__.ubwa.get_new_uuid_id()
+        self.__class__.ubwa._add_stream_to_stream_list(stream_id, ["!userData"], ["arr"],
+                                                        provided_listen_key="unittest-listen-key")
+        uri = self.__class__.ubwa.create_websocket_uri(["!userData"], ["arr"], stream_id)
+        self.assertEqual(uri, "wss://fstream.binance.com/pm/ws/unittest-listen-key")
+
+
+class TestPortfolioMarginRestclientRouting(unittest.TestCase):
+    """Regression test for the `binance.com-portfolio_margin` routing added in
+    `restclient.py` for issue #452. Uses a mocked `ubra` so it doesn't depend
+    on a released UBRA version already exposing the `portfolio_margin_stream_*`
+    methods.
+    """
+
+    @staticmethod
+    def _make_restclient():
+        stream_list = {
+            "id1": {
+                "api_key": "key",
+                "api_secret": "secret",
+                "symbols": None,
+                "listen_key": "existing-key",
+            }
+        }
+        rc = BinanceWebSocketApiRestclient(exchange="binance.com-portfolio_margin",
+                                           stream_list=stream_list)
+        rc.ubra = Mock()
+        rc.ubra.get_used_weight.return_value = {"weight": 0}
+        return rc
+
+    def test_get_listen_key_routes_to_portfolio_margin(self):
+        rc = self._make_restclient()
+        rc.ubra.portfolio_margin_stream_get_listen_key.return_value = {"listenKey": "new-key"}
+        response, _ = rc.get_listen_key(stream_id="id1")
+        rc.ubra.portfolio_margin_stream_get_listen_key.assert_called_once_with(
+            output="raw_data", throw_exception=False, api_key="key", api_secret="secret")
+        self.assertEqual(response, {"listenKey": "new-key"})
+
+    def test_keepalive_routes_to_portfolio_margin(self):
+        rc = self._make_restclient()
+        rc.ubra.portfolio_margin_stream_keepalive.return_value = {}
+        rc.keepalive_listen_key(stream_id="id1")
+        rc.ubra.portfolio_margin_stream_keepalive.assert_called_once_with(
+            listenKey="existing-key", throw_exception=False, api_key="key", api_secret="secret")
+
+    def test_delete_routes_to_portfolio_margin(self):
+        rc = self._make_restclient()
+        rc.ubra.portfolio_margin_stream_close.return_value = {}
+        rc.delete_listen_key(stream_id="id1")
+        rc.ubra.portfolio_margin_stream_close.assert_called_once_with(
+            listenKey="existing-key", throw_exception=False, api_key="key", api_secret="secret")
+
+
+class TestRestclientUnknownExchangeIsHandled(unittest.TestCase):
+    """Regression test: `_init_ubra()` must not let `UnknownExchange` propagate uncaught.
+
+    This can happen for ANY exchange string UBWA knows but the installed UBRA doesn't (yet) -
+    e.g. right after a new exchange is added to UBWA ahead of the corresponding UBRA release,
+    as was the case for `binance.com-portfolio_margin` in issue #452. Uses a bogus exchange
+    string instead of `binance.com-portfolio_margin` so this test stays meaningful even after
+    UBRA ships Portfolio Margin support.
+    """
+
+    @staticmethod
+    def _make_restclient():
+        stream_list = {
+            "id1": {
+                "api_key": "key",
+                "api_secret": "secret",
+                "symbols": None,
+                "listen_key": "existing-key",
+            }
+        }
+        return BinanceWebSocketApiRestclient(exchange="bogus-exchange-for-unittest",
+                                             stream_list=stream_list)
+
+    def test_get_listen_key_returns_none_instead_of_raising(self):
+        rc = self._make_restclient()
+        self.assertEqual(rc.get_listen_key(stream_id="id1"), (None, None))
+        self.assertIsNone(rc.ubra)
+
+    def test_keepalive_listen_key_returns_none_instead_of_raising(self):
+        rc = self._make_restclient()
+        self.assertEqual(rc.keepalive_listen_key(stream_id="id1"), (None, None))
+
+    def test_delete_listen_key_returns_none_instead_of_raising(self):
+        rc = self._make_restclient()
+        self.assertEqual(rc.delete_listen_key(stream_id="id1"), (None, None))
 
 
 if __name__ == '__main__':

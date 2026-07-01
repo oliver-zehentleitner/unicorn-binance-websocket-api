@@ -53,8 +53,19 @@ Defined in `unicorn_binance_websocket_api/connection_settings.py` as the `Exchan
 | `binance.com-isolated_margin` | 1024 |
 | `binance.com-futures` | 200 |
 | `binance.com-coin_futures` | 200 |
+| `binance.com-portfolio_margin` | 200 (listenKey/user-data streams only, see below) |
 | `binance.us` | 1024 |
 | `trbinance.com` | 1024 |
+
+Portfolio Margin (`binance.com-portfolio_margin`) is scoped to the user data
+stream lifecycle: `wss://fstream.binance.com/pm/ws/<listenKey>`, with the
+listenKey acquired/kept-alive/closed via UBRA's PAPI methods
+(`portfolio_margin_stream_get_listen_key()` etc.). It is intentionally NOT
+part of `BINANCE_FUTURES_EXCHANGES` — it keeps the legacy `/ws/<listenKey>`
+path form, not the `/private/ws?listenKey=...&events=...` form used by
+`binance.com-futures`/`binance.com-futures-testnet`. There is no
+`websocket_api_base_uri` (no WS API) and no public market-data endpoint for
+this exchange yet. See [issue #452](https://github.com/oliver-zehentleitner/unicorn-binance-websocket-api/issues/452).
 
 ---
 

@@ -57,6 +57,7 @@ class Exchanges(str, Enum):
     BINANCE_FUTURES_TESTNET = "binance.com-futures-testnet"
     BINANCE_VANILLA_OPTIONS = "binance.com-vanilla-options"
     BINANCE_VANILLA_OPTIONS_TESTNET = "binance.com-vanilla-options-testnet"
+    BINANCE_PORTFOLIO_MARGIN = "binance.com-portfolio_margin"
     BINANCE_US = "binance.us"
     TRBINANCE = "trbinance.com"
 
@@ -73,6 +74,7 @@ CEX_EXCHANGES = [
     Exchanges.BINANCE_FUTURES_TESTNET,
     Exchanges.BINANCE_VANILLA_OPTIONS,
     Exchanges.BINANCE_VANILLA_OPTIONS_TESTNET,
+    Exchanges.BINANCE_PORTFOLIO_MARGIN,
     Exchanges.BINANCE_US,
     Exchanges.TRBINANCE,
 ]
@@ -92,6 +94,7 @@ CONNECTION_SETTINGS = {
     Exchanges.BINANCE_COIN_FUTURES: (200, "wss://dstream.binance.com/", None),
     Exchanges.BINANCE_VANILLA_OPTIONS: (200, "wss://fstream.binance.com/public/", None),
     Exchanges.BINANCE_VANILLA_OPTIONS_TESTNET: (200, "wss://fstream.binancefuture.com/public/", None),
+    Exchanges.BINANCE_PORTFOLIO_MARGIN: (200, "wss://fstream.binance.com/pm/", None),
     Exchanges.BINANCE_US: (1024, "wss://stream.binance.us:9443/", None),
     Exchanges.TRBINANCE: (1024, "wss://stream-cloud.trbinance.com/", None),
 }
@@ -110,6 +113,10 @@ USERDATA_WS_API_EXCHANGES = frozenset([
 
 # Exchanges that route USDT-M Futures WebSocket streams via the per-category base
 # paths /public, /market, /private (Binance announcement effective 2026-04-23).
+# BINANCE_PORTFOLIO_MARGIN is intentionally NOT part of this set: its user data
+# stream keeps the legacy `/pm/ws/<listenKey>` path form (no /private sub-path,
+# no `&events=` query filter), so it must fall through to the `else` branch in
+# BinanceWebSocketApiManager.create_websocket_uri().
 BINANCE_FUTURES_EXCHANGES = frozenset([
     Exchanges.BINANCE_FUTURES,
     Exchanges.BINANCE_FUTURES_TESTNET,

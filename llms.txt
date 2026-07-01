@@ -1,6 +1,8 @@
 # UNICORN Binance WebSocket API (UBWA)
 
 > Real-time market data and user data streams for Binance with automatic reconnect.
+> Covers Spot, Margin, Isolated Margin, USD-M/Coin-M Futures, European Options,
+> Portfolio Margin (user data stream only), Binance.US and TR.
 > Part of [UNICORN Binance Suite](https://github.com/oliver-zehentleitner/unicorn-binance-suite).
 
 Beginner-friendly despite depth — complexity is optional, the API stays clean and Pythonic.
