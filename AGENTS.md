@@ -176,4 +176,6 @@ async def main():
 <!-- keep-the-why:config -->
 - context: `context/`
 - init: complete
+- context-schema: 0.5.1
+- capture-confirmation: confirm-when-unsure
 <!-- /keep-the-why:config -->

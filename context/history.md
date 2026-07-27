@@ -3,7 +3,8 @@
 ## Repo origin: LUCIT-Systems-and-Development
 
 **Status:** superseded — repo now lives under `oliver-zehentleitner`
-**Confirmed** (git history; earliest commits reference `github.com/LUCIT-Systems-and-Development/unicorn-binance-websocket-api`)
+**Evidence:** confirmed
+**Source:** git history; earliest commits reference `github.com/LUCIT-Systems-and-Development/unicorn-binance-websocket-api`
 
 The repo was previously hosted under the `LUCIT-Systems-and-Development` GitHub org, with LUCIT branding, a LUCIT licensing/monitoring layer, and a contributor-copyright-assignment clause in `CONTRIBUTING.md`. It moved to `oliver-zehentleitner` and was cleaned up across many commits in 2026 (`remove LUCIT`, `Clean remaining LUCIT references outside the conda pipeline`, etc.) — same cleanup wave as the rest of the suite (see `unicorn-binance-suite`'s `context/history.md`).
 
@@ -14,7 +15,8 @@ The repo was previously hosted under the `LUCIT-Systems-and-Development` GitHub 
 ## Icinga/monitoring REST server removed, not just rebranded
 
 **Status:** active
-**Confirmed** (commit `ee615105`)
+**Evidence:** confirmed
+**Source:** commit `ee615105`
 
 `restserver.py` (a Flask REST server exposing only a LUCIT/Icinga monitoring check-command endpoint) was deleted entirely — `start_monitoring_api()`, `stop_monitoring_api()`, `get_monitoring_status_icinga()`, and the related check-command methods are gone, along with the `flask`/`flask_restful`/`cheroot` dependencies. `get_monitoring_status_plain()` was kept, stripped of `check_lucit` references.
 
@@ -25,7 +27,8 @@ The repo was previously hosted under the `LUCIT-Systems-and-Development` GitHub 
 ## Hardcoded LUCIT org URL broke `get_latest_release_info()`
 
 **Status:** superseded — fixed
-**Confirmed** (commit `c2eb03ac`)
+**Evidence:** confirmed
+**Source:** commit `c2eb03ac`
 
 After the repo moved from `LUCIT-Systems-and-Development` to `oliver-zehentleitner`, `get_latest_release_info()` still queried the GitHub API using the old org's URL, so the built-in "is an update available" check silently looked at the wrong (now-stale or gone) repo.
 
