@@ -46,52 +46,71 @@ async def binance_stream(ubwa):
         while ubwa.is_stop_request(stream_id=stream_id) is False:
             data = await ubwa.get_stream_data_from_asyncio_queue(stream_id=stream_id)
             try:
-                if data['result']['serverTime'] is not None:
-                    print(f"UBWA: Time between request and answer: {(time.time() - start_time_get_server_time_ubwa)} "
-                          f"seconds\r\nreceived data:\r\n{data}\r\n")
+                if data["result"]["serverTime"] is not None:
+                    print(
+                        f"UBWA: Time between request and answer: {(time.time() - start_time_get_server_time_ubwa)} "
+                        f"seconds\r\nreceived data:\r\n{data}\r\n"
+                    )
             except KeyError:
                 print(f"received data:\r\n{data}\r\n")
             except TypeError:
                 print(f"received data:\r\n{data}\r\n")
 
-    api_stream = ubwa.create_stream(api=True, api_key=api_key, api_secret=api_secret,
-                                    stream_label="Bobs Websocket API",
-                                    process_asyncio_queue=handle_socket_message)
+    api_stream = ubwa.create_stream(
+        api=True,
+        api_key=api_key,
+        api_secret=api_secret,
+        stream_label="Bobs Websocket API",
+        process_asyncio_queue=handle_socket_message,
+    )
     time.sleep(5)
     for i in range(10):
         print(f"##################################################################")
         start_time_get_server_time_ubwa = time.time()
         ubwa.api.get_server_time(stream_id=api_stream)
         ubwa.api.get_server_time(stream_id=api_stream)
-        ubwa_server_time = ubwa.api.get_server_time(stream_id=api_stream, return_response=True)
-        print(f"UBRA: Time between request and answer: {(time.time() - start_time_get_server_time_ubwa)} "
-              f"seconds\r\nreceived data:\r\n{ubwa_server_time}\r\n")
+        ubwa_server_time = ubwa.api.get_server_time(
+            stream_id=api_stream, return_response=True
+        )
+        print(
+            f"UBRA: Time between request and answer: {(time.time() - start_time_get_server_time_ubwa)} "
+            f"seconds\r\nreceived data:\r\n{ubwa_server_time}\r\n"
+        )
         print(f"Finished! Waiting for responses ...")
         time.sleep(2)
         print(f"------------------------------------------------------------------")
         start_time_get_server_time_ubra = time.time()
         ubra_server_time = ubra.get_server_time()
-        print(f"UBRA: Time between request and answer: {(time.time() - start_time_get_server_time_ubra)} "
-              f"seconds\r\nreceived data:\r\n{ubra_server_time}\r\n")
+        print(
+            f"UBRA: Time between request and answer: {(time.time() - start_time_get_server_time_ubra)} "
+            f"seconds\r\nreceived data:\r\n{ubra_server_time}\r\n"
+        )
         ubra_server_time = ubra.get_server_time()
-        print(f"UBRA: Time between request and answer: {(time.time() - start_time_get_server_time_ubra)} "
-              f"seconds\r\nreceived data:\r\n{ubra_server_time}\r\n")
+        print(
+            f"UBRA: Time between request and answer: {(time.time() - start_time_get_server_time_ubra)} "
+            f"seconds\r\nreceived data:\r\n{ubra_server_time}\r\n"
+        )
         ubra_server_time = ubra.get_server_time()
-        print(f"UBRA: Time between request and answer: {(time.time() - start_time_get_server_time_ubra)} "
-              f"seconds\r\nreceived data:\r\n{ubra_server_time}\r\n")
+        print(
+            f"UBRA: Time between request and answer: {(time.time() - start_time_get_server_time_ubra)} "
+            f"seconds\r\nreceived data:\r\n{ubra_server_time}\r\n"
+        )
     print(f"Stopping!")
     ubwa.stop_manager()
     ubra.stop_manager()
 
+
 if __name__ == "__main__":
     logging.getLogger("unicorn_binance_websocket_api")
-    logging.basicConfig(level=logging.DEBUG,
-                        filename=os.path.basename(__file__) + '.log',
-                        format="{asctime} [{levelname:8}] {process} {thread} {module}: {message}",
-                        style="{")
+    logging.basicConfig(
+        level=logging.DEBUG,
+        filename=os.path.basename(__file__) + ".log",
+        format="{asctime} [{levelname:8}] {process} {thread} {module}: {message}",
+        style="{",
+    )
 
-    ubwa = BinanceWebSocketApiManager(exchange='binance.com', output_default="dict")
-    ubra = BinanceRestApiManager(exchange='binance.com')
+    ubwa = BinanceWebSocketApiManager(exchange="binance.com", output_default="dict")
+    ubra = BinanceRestApiManager(exchange="binance.com")
     try:
         asyncio.run(binance_stream(ubwa))
     except KeyboardInterrupt:

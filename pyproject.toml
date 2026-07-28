@@ -41,3 +41,7 @@ build-backend = "setuptools.build_meta"
 
 [tool.poetry.package_data]
 "unicorn_binance_websocket_api" = ["*.so", "*.dll", "*.py", "*.pyd", "*.pyi"]
+
+[tool.black]
+line-length = 88
+target-version = ["py39"]

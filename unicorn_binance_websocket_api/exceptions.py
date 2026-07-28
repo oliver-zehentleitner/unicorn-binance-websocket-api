@@ -38,15 +38,19 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
 # IN THE SOFTWARE.
 
+
 class MaximumSubscriptionsExceeded(Exception):
     """
     Exception if the maximum number of subscriptions per stream has been exceeded!
     """
+
     def __init__(self, exchange: str = None, max_subscriptions_per_stream: int = None):
-        self.message = (f"The maximum number of {max_subscriptions_per_stream} subscriptions per stream for exchange "
-                        f"'{exchange}' has been exceeded! For detailed information please have a look at our wiki: "
-                        f"https://github.com/oliver-zehentleitner/unicorn-binance-websocket-api/wiki/Binance-"
-                        f"websocket-endpoint-configuration-overview")
+        self.message = (
+            f"The maximum number of {max_subscriptions_per_stream} subscriptions per stream for exchange "
+            f"'{exchange}' has been exceeded! For detailed information please have a look at our wiki: "
+            f"https://github.com/oliver-zehentleitner/unicorn-binance-websocket-api/wiki/Binance-"
+            f"websocket-endpoint-configuration-overview"
+        )
         super().__init__(self.message)
 
 
@@ -54,6 +58,7 @@ class Socks5ProxyConnectionError(Exception):
     """
     Exception if the manager class is not able to establish a connection to the socks5 proxy.
     """
+
     pass
 
 
@@ -61,8 +66,11 @@ class StreamIsCrashing(Exception):
     """
     Exception if the stream is crashing.
     """
+
     def __init__(self, stream_id=None, reason=None):
-        self.message = f"Stream with stream_id={stream_id} is crashing! Reason: {reason}"
+        self.message = (
+            f"Stream with stream_id={stream_id} is crashing! Reason: {reason}"
+        )
         super().__init__(self.message)
 
 
@@ -70,8 +78,11 @@ class StreamIsRestarting(Exception):
     """
     Exception if the stream is restarting.
     """
+
     def __init__(self, stream_id=None, reason=None):
-        self.message = f"Stream with stream_id={stream_id} is restarting! Reason: {reason}"
+        self.message = (
+            f"Stream with stream_id={stream_id} is restarting! Reason: {reason}"
+        )
         super().__init__(self.message)
 
 
@@ -79,8 +90,11 @@ class StreamIsStopping(Exception):
     """
     Exception if the stream is stopping.
     """
+
     def __init__(self, stream_id=None, reason=None):
-        self.message = f"Stream with stream_id={stream_id} is stopping! Reason: {reason}"
+        self.message = (
+            f"Stream with stream_id={stream_id} is stopping! Reason: {reason}"
+        )
         super().__init__(self.message)
 
 

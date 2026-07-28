@@ -10,10 +10,12 @@ import logging
 import os
 
 logging.getLogger("unicorn_binance_websocket_api")
-logging.basicConfig(level=logging.ERROR,
-                    filename=os.path.basename(__file__) + '.log',
-                    format="{asctime} [{levelname:8}] {process} {thread} {module}: {message}",
-                    style="{")
+logging.basicConfig(
+    level=logging.ERROR,
+    filename=os.path.basename(__file__) + ".log",
+    format="{asctime} [{levelname:8}] {process} {thread} {module}: {message}",
+    style="{",
+)
 load_dotenv()
 
 
@@ -25,36 +27,48 @@ class BinanceDataProcessor:
         self.ubwa: BinanceWebSocketApiManager = ubwa_manager
 
     async def main(self):
-        self.ubwa.create_stream(channels=["!userData"],
-                                markets=["arr"],
-                                stream_label="!userData",
-                                api_key=os.getenv('BINANCE_API_KEY'),
-                                api_secret=os.getenv('BINANCE_API_SECRET'),
-                                process_asyncio_queue=self.process_data)
+        self.ubwa.create_stream(
+            channels=["!userData"],
+            markets=["arr"],
+            stream_label="!userData",
+            api_key=os.getenv("BINANCE_API_KEY"),
+            api_secret=os.getenv("BINANCE_API_SECRET"),
+            process_asyncio_queue=self.process_data,
+        )
 
-        self.ubwa.create_stream(channels='!miniTicker',
-                                markets="arr",
-                                stream_label="!miniTicker",
-                                process_asyncio_queue=self.process_data)
+        self.ubwa.create_stream(
+            channels="!miniTicker",
+            markets="arr",
+            stream_label="!miniTicker",
+            process_asyncio_queue=self.process_data,
+        )
 
         with BinanceRestApiManager() as ubra:
-            markets: list = [item['symbol'] for item in ubra.get_all_tickers() if item['symbol'].endswith("USDT")]
-        channels: list = ['aggTrade', 'kline_1m', 'depth5']
+            markets: list = [
+                item["symbol"]
+                for item in ubra.get_all_tickers()
+                if item["symbol"].endswith("USDT")
+            ]
+        channels: list = ["aggTrade", "kline_1m", "depth5"]
         for channel in channels:
-            self.ubwa.create_stream(channels=channel,
-                                    markets=markets[:self.markets_limit],
-                                    process_asyncio_queue=self.process_data,
-                                    stream_label=channel)
+            self.ubwa.create_stream(
+                channels=channel,
+                markets=markets[: self.markets_limit],
+                process_asyncio_queue=self.process_data,
+                stream_label=channel,
+            )
 
         while self.ubwa.is_manager_stopping() is False:
-            if os.getenv('EXPORT_TO_PNG') is None:
+            if os.getenv("EXPORT_TO_PNG") is None:
                 self.ubwa.print_summary(footer=self.footer, title=self.title)
                 await asyncio.sleep(1)
             else:
-                self.ubwa.print_summary_to_png(height_per_row=13.5,
-                                               print_summary_export_path="/var/www/html/",
-                                               footer=self.footer,
-                                               title=self.title)
+                self.ubwa.print_summary_to_png(
+                    height_per_row=13.5,
+                    print_summary_export_path="/var/www/html/",
+                    footer=self.footer,
+                    title=self.title,
+                )
                 await asyncio.sleep(10)
 
     async def process_data(self, stream_id=None):

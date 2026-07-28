@@ -56,14 +56,16 @@ extensions = [
 print("Generating stub files ...")
 os.makedirs(stubs_dir, exist_ok=True)
 for filename in os.listdir(source_dir):
-    if filename.endswith('.py'):
+    if filename.endswith(".py"):
         source_path = os.path.join(source_dir, filename)
-        subprocess.run(['stubgen', '-o', stubs_dir, source_path], check=True)
+        subprocess.run(["stubgen", "-o", stubs_dir, source_path], check=True)
 for stub_file in os.listdir(os.path.join(stubs_dir, source_dir)):
-    if stub_file.endswith('.pyi'):
+    if stub_file.endswith(".pyi"):
         source_stub_path = os.path.join(stubs_dir, source_dir, stub_file)
         if os.path.exists(os.path.join(source_dir, stub_file)):
-            print(f"Skipped moving {source_stub_path} because {os.path.join(source_dir, stub_file)} already exists!")
+            print(
+                f"Skipped moving {source_stub_path} because {os.path.join(source_dir, stub_file)} already exists!"
+            )
         else:
             shutil.move(source_stub_path, source_dir)
             print(f"Moved {source_stub_path} to {source_dir}!")
@@ -80,32 +82,42 @@ setup(
     author="Oliver Zehentleitner",
     url="https://github.com/oliver-zehentleitner/unicorn-binance-websocket-api",
     description="A Python SDK to use the Binance Websocket API`s (com+testnet, com-margin+testnet, "
-                "com-isolated_margin+testnet, com-futures+testnet, com-coin_futures, com-vanilla-options+testnet, us, "
-                "tr) in a simple, fast, flexible, robust and fully-featured way.",
+    "com-isolated_margin+testnet, com-futures+testnet, com-coin_futures, com-vanilla-options+testnet, us, "
+    "tr) in a simple, fast, flexible, robust and fully-featured way.",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    license='MIT',
-    install_requires=['colorama', 'requests>=2.31.0', 'websocket-client', 'websockets>=14.0',
-                      'orjson', 'psutil', 'PySocks',
-                      'unicorn-fy>=0.17.2', 'unicorn-binance-rest-api>=2.12.0', 'typing_extensions', 'Cython'],
-    keywords='binance, asyncio, async, asynchronous, concurrent, websocket-api, webstream-api, '
-             'binance-websocket, binance-webstream, webstream, websocket, api, binance-dex, '
-             'binance-futures, binance-margin, binance-us',
+    license="MIT",
+    install_requires=[
+        "colorama",
+        "requests>=2.31.0",
+        "websocket-client",
+        "websockets>=14.0",
+        "orjson",
+        "psutil",
+        "PySocks",
+        "unicorn-fy>=0.17.2",
+        "unicorn-binance-rest-api>=2.12.0",
+        "typing_extensions",
+        "Cython",
+    ],
+    keywords="binance, asyncio, async, asynchronous, concurrent, websocket-api, webstream-api, "
+    "binance-websocket, binance-webstream, webstream, websocket, api, binance-dex, "
+    "binance-futures, binance-margin, binance-us",
     project_urls={
-        'Howto': 'https://github.com/oliver-zehentleitner/unicorn-binance-websocket-api#related-articles',
-        'Documentation': 'https://oliver-zehentleitner.github.io/unicorn-binance-websocket-api',
-        'Wiki': 'https://github.com/oliver-zehentleitner/unicorn-binance-websocket-api/wiki',
-        'Author': 'https://www.linkedin.com/in/oliver-zehentleitner',
-        'Changes': 'https://oliver-zehentleitner.github.io/unicorn-binance-websocket-api/changelog.html',
-        'License': 'https://oliver-zehentleitner.github.io/unicorn-binance-websocket-api/license.html',
-        'Issue Tracker': 'https://github.com/oliver-zehentleitner/unicorn-binance-websocket-api/issues',
-        'Telegram': 'https://t.me/unicorndevs',
-        'Umbrella Project': 'https://github.com/oliver-zehentleitner/unicorn-binance-suite',
+        "Howto": "https://github.com/oliver-zehentleitner/unicorn-binance-websocket-api#related-articles",
+        "Documentation": "https://oliver-zehentleitner.github.io/unicorn-binance-websocket-api",
+        "Wiki": "https://github.com/oliver-zehentleitner/unicorn-binance-websocket-api/wiki",
+        "Author": "https://www.linkedin.com/in/oliver-zehentleitner",
+        "Changes": "https://oliver-zehentleitner.github.io/unicorn-binance-websocket-api/changelog.html",
+        "License": "https://oliver-zehentleitner.github.io/unicorn-binance-websocket-api/license.html",
+        "Issue Tracker": "https://github.com/oliver-zehentleitner/unicorn-binance-websocket-api/issues",
+        "Telegram": "https://t.me/unicorndevs",
+        "Umbrella Project": "https://github.com/oliver-zehentleitner/unicorn-binance-suite",
     },
     packages=find_packages(exclude=[f"dev/{source_dir}"], include=[source_dir]),
-    ext_modules=cythonize(extensions, compiler_directives={'language_level': "3"}),
-    python_requires='>=3.9.0',
-    package_data={'': ['*.so', '*.dll', '*.py', '*.pyd', '*.pyi']},
+    ext_modules=cythonize(extensions, compiler_directives={"language_level": "3"}),
+    python_requires=">=3.9.0",
+    package_data={"": ["*.so", "*.dll", "*.py", "*.pyd", "*.pyi"]},
     include_package_data=True,
     classifiers=[
         "Development Status :: 5 - Production/Stable",

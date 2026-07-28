@@ -41,7 +41,12 @@
 from .futures import BinanceWebSocketApiApiFutures
 from .spot import BinanceWebSocketApiApiSpot
 
-class WsApi():
+
+class WsApi:
     def __init__(self, manager):
-        self.futures: BinanceWebSocketApiApiFutures = BinanceWebSocketApiApiFutures(manager=manager)
-        self.spot: BinanceWebSocketApiApiSpot = BinanceWebSocketApiApiSpot(manager=manager)
+        self.futures: BinanceWebSocketApiApiFutures = BinanceWebSocketApiApiFutures(
+            manager=manager
+        )
+        self.spot: BinanceWebSocketApiApiSpot = BinanceWebSocketApiApiSpot(
+            manager=manager
+        )

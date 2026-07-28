@@ -39,24 +39,87 @@ import time
 from example_process_streams import BinanceWebSocketApiProcessStreams
 
 logging.getLogger("unicorn_binance_websocket_api")
-logging.basicConfig(level=logging.DEBUG,
-                    filename=os.path.basename(__file__) + '.log',
-                    format="{asctime} [{levelname:8}] {process} {thread} {module}: {message}",
-                    style="{")
+logging.basicConfig(
+    level=logging.DEBUG,
+    filename=os.path.basename(__file__) + ".log",
+    format="{asctime} [{levelname:8}] {process} {thread} {module}: {message}",
+    style="{",
+)
 
 # create instance of BinanceWebSocketApiManager and provide the function for stream processing
-binance_websocket_api_manager = BinanceWebSocketApiManager(BinanceWebSocketApiProcessStreams.process_stream_data)
+binance_websocket_api_manager = BinanceWebSocketApiManager(
+    BinanceWebSocketApiProcessStreams.process_stream_data
+)
 
 # define markets
-markets = {'bnbbtc', 'ethbtc', 'btcusdt', 'bchabcusdt', 'xrpusdt', 'rvnbtc', 'ltcusdt', 'adausdt', 'eosusdt',
-           'neousdt', 'bnbusdt', 'adabtc', 'ethusdt', 'trxbtc', 'bchabcbtc', 'ltcbtc', 'xrpbtc',
-           'ontbtc', 'bttusdt', 'eosbtc', 'xlmbtc', 'bttbtc', 'tusdusdt', 'xlmusdt', 'qkcbtc', 'zrxbtc',
-           'neobtc', 'adaeth', 'icxusdt', 'btctusd', 'icxbtc', 'btcusdc', 'wanbtc', 'zecbtc', 'wtcbtc',
-           'dashbtc', 'rvnbnb', 'bchabctusd', 'etcbtc', 'bnbeth', 'ethpax', 'nanobtc', 'xembtc', 'xrpbnb',
-           'bchabcpax', 'xrpeth', 'bttbnb', 'ltcbnb', 'agibtc', 'zrxusdt', 'xlmbnb', 'ltceth', 'eoseth'}
+markets = {
+    "bnbbtc",
+    "ethbtc",
+    "btcusdt",
+    "bchabcusdt",
+    "xrpusdt",
+    "rvnbtc",
+    "ltcusdt",
+    "adausdt",
+    "eosusdt",
+    "neousdt",
+    "bnbusdt",
+    "adabtc",
+    "ethusdt",
+    "trxbtc",
+    "bchabcbtc",
+    "ltcbtc",
+    "xrpbtc",
+    "ontbtc",
+    "bttusdt",
+    "eosbtc",
+    "xlmbtc",
+    "bttbtc",
+    "tusdusdt",
+    "xlmusdt",
+    "qkcbtc",
+    "zrxbtc",
+    "neobtc",
+    "adaeth",
+    "icxusdt",
+    "btctusd",
+    "icxbtc",
+    "btcusdc",
+    "wanbtc",
+    "zecbtc",
+    "wtcbtc",
+    "dashbtc",
+    "rvnbnb",
+    "bchabctusd",
+    "etcbtc",
+    "bnbeth",
+    "ethpax",
+    "nanobtc",
+    "xembtc",
+    "xrpbnb",
+    "bchabcpax",
+    "xrpeth",
+    "bttbnb",
+    "ltcbnb",
+    "agibtc",
+    "zrxusdt",
+    "xlmbnb",
+    "ltceth",
+    "eoseth",
+}
 
 # define stream channels
-channels = {'trade', 'kline_1', 'kline_5', 'kline_15', 'kline_30', 'kline_1h', 'kline_12h', 'kline_1w', 'miniTicker'}
+channels = {
+    "trade",
+    "kline_1",
+    "kline_5",
+    "kline_15",
+    "kline_30",
+    "kline_1h",
+    "kline_12h",
+    "kline_1w",
+    "miniTicker",
+}
 
 # create and start the stream
 print("please wait 10 seconds!")
@@ -73,6 +136,8 @@ time.sleep(3)
 print("\r\n\r\n")
 binance_websocket_api_manager.print_stream_info(multi_stream_id)
 
-print("\r\n=============================== Stopping BinanceWebSocketManager ======================================\r\n")
+print(
+    "\r\n=============================== Stopping BinanceWebSocketManager ======================================\r\n"
+)
 binance_websocket_api_manager.stop_manager_with_all_streams()
 print("finished!")

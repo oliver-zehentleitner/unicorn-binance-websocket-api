@@ -36,24 +36,32 @@ import os
 import time
 
 logging.getLogger("unicorn_binance_websocket_api")
-logging.basicConfig(level=logging.DEBUG,
-                    filename=os.path.basename(__file__) + '.log',
-                    format="{asctime} [{levelname:8}] {process} {thread} {module}: {message}",
-                    style="{")
+logging.basicConfig(
+    level=logging.DEBUG,
+    filename=os.path.basename(__file__) + ".log",
+    format="{asctime} [{levelname:8}] {process} {thread} {module}: {message}",
+    style="{",
+)
 
 
 def callback_data(stream_data):
     print(f"DATA: {stream_data}")
 
 
-def callback_signals(signal_type=None, stream_id=None, data_record=None, error_msg=None):
+def callback_signals(
+    signal_type=None, stream_id=None, data_record=None, error_msg=None
+):
     print(f"SIGNAL: {signal_type} - {stream_id} - {data_record} - {error_msg}")
 
 
-with BinanceWebSocketApiManager(auto_data_cleanup_stopped_streams=True,
-                                exchange="binance.com",
-                                process_stream_signals=callback_signals) as ubwa:
-    stream_id = ubwa.create_stream('depth20@1000ms', 'BNBBUSD', output='dict', process_stream_data=callback_data)
+with BinanceWebSocketApiManager(
+    auto_data_cleanup_stopped_streams=True,
+    exchange="binance.com",
+    process_stream_signals=callback_signals,
+) as ubwa:
+    stream_id = ubwa.create_stream(
+        "depth20@1000ms", "BNBBUSD", output="dict", process_stream_data=callback_data
+    )
     time.sleep(5)
     ubwa.stop_stream(stream_id)
     print(f"waiting till stream has stopped")

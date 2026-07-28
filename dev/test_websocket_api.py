@@ -50,16 +50,27 @@ async def binance_stream(ubwa):
     def handle_servertime_response(data):
         print(f"received server time response:\r\n{data}\r\n")
 
-    ubwa.create_stream(api=True, api_key=api_key, api_secret=api_secret, output="dict",
-                       process_stream_data=handle_socket_message, stream_label="Bobs Websocket API")
+    ubwa.create_stream(
+        api=True,
+        api_key=api_key,
+        api_secret=api_secret,
+        output="dict",
+        process_stream_data=handle_socket_message,
+        stream_label="Bobs Websocket API",
+    )
     print(f"Start:")
-    ubwa.api.get_server_time(process_response=handle_servertime_response, stream_label="Bobs Websocket API")
+    ubwa.api.get_server_time(
+        process_response=handle_servertime_response, stream_label="Bobs Websocket API"
+    )
     ubwa.api.get_account_status(stream_label="Bobs Websocket API")
-    orig_client_order_id = ubwa.api.create_order(price=1.0, order_type="LIMIT",
-                                                 quantity=15.0, side="SELL", symbol="BUSDUSDT")
-    ubwa.api.create_test_order(price=1.2, order_type="LIMIT", quantity=12.0, side="SELL", symbol="BUSDUSDT")
+    orig_client_order_id = ubwa.api.create_order(
+        price=1.0, order_type="LIMIT", quantity=15.0, side="SELL", symbol="BUSDUSDT"
+    )
+    ubwa.api.create_test_order(
+        price=1.2, order_type="LIMIT", quantity=12.0, side="SELL", symbol="BUSDUSDT"
+    )
     ubwa.api.ping(process_response=handle_ping_response)
-    ubwa.api.get_exchange_info(symbols=['BUSDUSDT'])
+    ubwa.api.get_exchange_info(symbols=["BUSDUSDT"])
     ubwa.api.get_order_book(symbol="BUSDUSDT", limit=2)
     ubwa.api.cancel_order(symbol="BUSDUSDT", orig_client_order_id=orig_client_order_id)
     ubwa.api.get_open_orders(symbol="BUSDUSDT")
@@ -90,13 +101,16 @@ async def binance_stream(ubwa):
     print(f"Stopping!")
     ubwa.stop_manager_with_all_streams()
 
+
 if __name__ == "__main__":
     logging.getLogger("unicorn_binance_websocket_api")
-    logging.basicConfig(level=logging.DEBUG,
-                        filename=os.path.basename(__file__) + '.log',
-                        format="{asctime} [{levelname:8}] {process} {thread} {module}: {message}",
-                        style="{")
-    ubwa = BinanceWebSocketApiManager(exchange='binance.com')
+    logging.basicConfig(
+        level=logging.DEBUG,
+        filename=os.path.basename(__file__) + ".log",
+        format="{asctime} [{levelname:8}] {process} {thread} {module}: {message}",
+        style="{",
+    )
+    ubwa = BinanceWebSocketApiManager(exchange="binance.com")
     try:
         asyncio.run(binance_stream(ubwa))
     except KeyboardInterrupt:

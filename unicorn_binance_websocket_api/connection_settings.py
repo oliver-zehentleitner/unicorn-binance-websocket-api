@@ -83,17 +83,53 @@ CEX_EXCHANGES = [
 # CONNECTION_SETTINGS: dict[str, Tuple[MAX_SUBSCRIPTIONS_PER_STREAM, WEBSOCKET_BASE_URI, WEBSOCKET_API_BASE_URI]] = {
 
 CONNECTION_SETTINGS = {
-    Exchanges.BINANCE: (1024, "wss://stream.binance.com:9443/", "wss://ws-api.binance.com/ws-api/v3"),
-    Exchanges.BINANCE_TESTNET: (1024, "wss://testnet.binance.vision/", "wss://testnet.binance.vision/ws-api/v3"),
-    Exchanges.BINANCE_MARGIN: (1024, "wss://stream.binance.com:9443/", "wss://ws-api.binance.com/ws-api/v3"),
-    Exchanges.BINANCE_MARGIN_TESTNET: (1024, "wss://testnet.binance.vision/", "wss://testnet.binance.vision/ws-api/v3"),
-    Exchanges.BINANCE_ISOLATED_MARGIN: (1024, "wss://stream.binance.com:9443/", "wss://ws-api.binance.com/ws-api/v3"),
-    Exchanges.BINANCE_ISOLATED_MARGIN_TESTNET: (1024, "wss://testnet.binance.vision/", "wss://testnet.binance.vision/ws-api/v3"),
-    Exchanges.BINANCE_FUTURES: (200, "wss://fstream.binance.com/", "wss://ws-fapi.binance.com/ws-fapi/v1"),
-    Exchanges.BINANCE_FUTURES_TESTNET: (200, "wss://stream.binancefuture.com/", "wss://testnet.binancefuture.com/ws-fapi/v1"),
+    Exchanges.BINANCE: (
+        1024,
+        "wss://stream.binance.com:9443/",
+        "wss://ws-api.binance.com/ws-api/v3",
+    ),
+    Exchanges.BINANCE_TESTNET: (
+        1024,
+        "wss://testnet.binance.vision/",
+        "wss://testnet.binance.vision/ws-api/v3",
+    ),
+    Exchanges.BINANCE_MARGIN: (
+        1024,
+        "wss://stream.binance.com:9443/",
+        "wss://ws-api.binance.com/ws-api/v3",
+    ),
+    Exchanges.BINANCE_MARGIN_TESTNET: (
+        1024,
+        "wss://testnet.binance.vision/",
+        "wss://testnet.binance.vision/ws-api/v3",
+    ),
+    Exchanges.BINANCE_ISOLATED_MARGIN: (
+        1024,
+        "wss://stream.binance.com:9443/",
+        "wss://ws-api.binance.com/ws-api/v3",
+    ),
+    Exchanges.BINANCE_ISOLATED_MARGIN_TESTNET: (
+        1024,
+        "wss://testnet.binance.vision/",
+        "wss://testnet.binance.vision/ws-api/v3",
+    ),
+    Exchanges.BINANCE_FUTURES: (
+        200,
+        "wss://fstream.binance.com/",
+        "wss://ws-fapi.binance.com/ws-fapi/v1",
+    ),
+    Exchanges.BINANCE_FUTURES_TESTNET: (
+        200,
+        "wss://stream.binancefuture.com/",
+        "wss://testnet.binancefuture.com/ws-fapi/v1",
+    ),
     Exchanges.BINANCE_COIN_FUTURES: (200, "wss://dstream.binance.com/", None),
     Exchanges.BINANCE_VANILLA_OPTIONS: (200, "wss://fstream.binance.com/public/", None),
-    Exchanges.BINANCE_VANILLA_OPTIONS_TESTNET: (200, "wss://fstream.binancefuture.com/public/", None),
+    Exchanges.BINANCE_VANILLA_OPTIONS_TESTNET: (
+        200,
+        "wss://fstream.binancefuture.com/public/",
+        None,
+    ),
     Exchanges.BINANCE_PORTFOLIO_MARGIN: (200, "wss://fstream.binance.com/pm/", None),
     Exchanges.BINANCE_US: (1024, "wss://stream.binance.us:9443/", None),
     Exchanges.TRBINANCE: (1024, "wss://stream-cloud.trbinance.com/", None),
@@ -102,14 +138,16 @@ CONNECTION_SETTINGS = {
 # Exchanges that use the new WS API userDataStream subscription flow (userDataStream.subscribe.signature)
 # instead of the legacy REST listenKey approach (POST /api/v3/userDataStream).
 # Binance deprecated and removed the listenKey REST endpoints for Spot and Margin in February 2026.
-USERDATA_WS_API_EXCHANGES = frozenset([
-    Exchanges.BINANCE,
-    Exchanges.BINANCE_TESTNET,
-    Exchanges.BINANCE_MARGIN,
-    Exchanges.BINANCE_MARGIN_TESTNET,
-    Exchanges.BINANCE_ISOLATED_MARGIN,
-    Exchanges.BINANCE_ISOLATED_MARGIN_TESTNET,
-])
+USERDATA_WS_API_EXCHANGES = frozenset(
+    [
+        Exchanges.BINANCE,
+        Exchanges.BINANCE_TESTNET,
+        Exchanges.BINANCE_MARGIN,
+        Exchanges.BINANCE_MARGIN_TESTNET,
+        Exchanges.BINANCE_ISOLATED_MARGIN,
+        Exchanges.BINANCE_ISOLATED_MARGIN_TESTNET,
+    ]
+)
 
 # Exchanges that route USDT-M Futures WebSocket streams via the per-category base
 # paths /public, /market, /private (Binance announcement effective 2026-04-23).
@@ -117,10 +155,12 @@ USERDATA_WS_API_EXCHANGES = frozenset([
 # stream keeps the legacy `/pm/ws/<listenKey>` path form (no /private sub-path,
 # no `&events=` query filter), so it must fall through to the `else` branch in
 # BinanceWebSocketApiManager.create_websocket_uri().
-BINANCE_FUTURES_EXCHANGES = frozenset([
-    Exchanges.BINANCE_FUTURES,
-    Exchanges.BINANCE_FUTURES_TESTNET,
-])
+BINANCE_FUTURES_EXCHANGES = frozenset(
+    [
+        Exchanges.BINANCE_FUTURES,
+        Exchanges.BINANCE_FUTURES_TESTNET,
+    ]
+)
 
 # UBWA-internal channel/market suffix markers — tokens that may appear in `channels`
 # or `markets` but do not pin a Futures WS category (e.g. `arr` as in `!ticker@arr`,

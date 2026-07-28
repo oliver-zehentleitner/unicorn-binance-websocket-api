@@ -12,10 +12,12 @@ api_secret = ""
 exchange = "binance.com-portfolio_margin"
 
 logging.getLogger("unicorn_binance_websocket_api")
-logging.basicConfig(level=logging.INFO,
-                    filename=os.path.basename(__file__) + '.log',
-                    format="{asctime} [{levelname:8}] {process} {thread} {module}: {message}",
-                    style="{")
+logging.basicConfig(
+    level=logging.INFO,
+    filename=os.path.basename(__file__) + ".log",
+    format="{asctime} [{levelname:8}] {process} {thread} {module}: {message}",
+    style="{",
+)
 
 
 # Binance Portfolio Margin user data streams live at
@@ -31,16 +33,22 @@ logging.basicConfig(level=logging.INFO,
 
 class BinancePortfolioMarginUserDataProcessor:
     def __init__(self):
-        self.ubwa = BinanceWebSocketApiManager(exchange=exchange,
-                                               enable_stream_signal_buffer=True,
-                                               process_stream_signals=self.receive_stream_signal,
-                                               output_default="dict")
+        self.ubwa = BinanceWebSocketApiManager(
+            exchange=exchange,
+            enable_stream_signal_buffer=True,
+            process_stream_signals=self.receive_stream_signal,
+            output_default="dict",
+        )
 
     async def main(self):
-        self.ubwa.create_stream('arr', '!userData',
-                                api_key=api_key, api_secret=api_secret,
-                                process_asyncio_queue=self.process_userdata,
-                                stream_label="PM_UserData")
+        self.ubwa.create_stream(
+            "arr",
+            "!userData",
+            api_key=api_key,
+            api_secret=api_secret,
+            process_asyncio_queue=self.process_userdata,
+            stream_label="PM_UserData",
+        )
 
         await asyncio.sleep(5)
         while self.ubwa.is_manager_stopping() is False:
@@ -48,15 +56,21 @@ class BinancePortfolioMarginUserDataProcessor:
             await asyncio.sleep(600)
 
     async def process_userdata(self, stream_id=None):
-        print(f"Processing data of {self.ubwa.get_stream_label(stream_id=stream_id)} ...")
+        print(
+            f"Processing data of {self.ubwa.get_stream_label(stream_id=stream_id)} ..."
+        )
         while self.ubwa.is_stop_request(stream_id=stream_id) is False:
             data = await self.ubwa.get_stream_data_from_asyncio_queue(stream_id)
             print(f"data: {data}")
             self.ubwa.asyncio_queue_task_done(stream_id)
 
-    def receive_stream_signal(self, signal_type=None, stream_id=None, data_record=None, error_msg=None):
-        print(f"Received stream_signal for stream '{self.ubwa.get_stream_label(stream_id=stream_id)}': "
-              f"{signal_type} - {stream_id} - {data_record} - {error_msg}")
+    def receive_stream_signal(
+        self, signal_type=None, stream_id=None, data_record=None, error_msg=None
+    ):
+        print(
+            f"Received stream_signal for stream '{self.ubwa.get_stream_label(stream_id=stream_id)}': "
+            f"{signal_type} - {stream_id} - {data_record} - {error_msg}"
+        )
 
 
 if __name__ == "__main__":

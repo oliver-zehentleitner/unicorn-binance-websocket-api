@@ -32,6 +32,7 @@
 
 import logging
 import sys
+
 try:
     from unicorn_fy.unicorn_fy import UnicornFy
 except ImportError:
@@ -57,17 +58,37 @@ class BinanceWebSocketApiProcessStreams(object):
         # PyPI: https://pypi.org/project/unicorn-fy/
         exchange = "binance.com"
         if exchange == "binance.com" or exchange == "binance.com-testnet":
-            unicorn_fied_stream_data = UnicornFy.binance_com_websocket(received_stream_data_json)
-        elif exchange == "binance.com-futures" or exchange == "binance.com-futures-testnet":
-            unicorn_fied_stream_data = UnicornFy.binance_com_futures_websocket(received_stream_data_json)
-        elif exchange == "binance.com-margin" or exchange == "binance.com-margin-testnet":
-            unicorn_fied_stream_data = UnicornFy.binance_com_margin_websocket(received_stream_data_json)
-        elif exchange == "binance.com-isolated_margin" or exchange == "binance.com-isolated_margin-testnet":
-            unicorn_fied_stream_data = UnicornFy.binance_com_margin_websocket(received_stream_data_json)
+            unicorn_fied_stream_data = UnicornFy.binance_com_websocket(
+                received_stream_data_json
+            )
+        elif (
+            exchange == "binance.com-futures"
+            or exchange == "binance.com-futures-testnet"
+        ):
+            unicorn_fied_stream_data = UnicornFy.binance_com_futures_websocket(
+                received_stream_data_json
+            )
+        elif (
+            exchange == "binance.com-margin" or exchange == "binance.com-margin-testnet"
+        ):
+            unicorn_fied_stream_data = UnicornFy.binance_com_margin_websocket(
+                received_stream_data_json
+            )
+        elif (
+            exchange == "binance.com-isolated_margin"
+            or exchange == "binance.com-isolated_margin-testnet"
+        ):
+            unicorn_fied_stream_data = UnicornFy.binance_com_margin_websocket(
+                received_stream_data_json
+            )
         elif exchange == "binance.je":
-            unicorn_fied_stream_data = UnicornFy.binance_je_websocket(received_stream_data_json)
+            unicorn_fied_stream_data = UnicornFy.binance_je_websocket(
+                received_stream_data_json
+            )
         elif exchange == "binance.us":
-            unicorn_fied_stream_data = UnicornFy.binance_us_websocket(received_stream_data_json)
+            unicorn_fied_stream_data = UnicornFy.binance_us_websocket(
+                received_stream_data_json
+            )
         else:
             logging.error("Not a valid exchange: " + str(exchange))
 
@@ -75,20 +96,22 @@ class BinanceWebSocketApiProcessStreams(object):
         # Its up to you if you call the methods in the bottom of this file or to call other classes which do what
         # ever you want to be done.
         try:
-            if unicorn_fied_stream_data['event_type'] == "aggTrade":
+            if unicorn_fied_stream_data["event_type"] == "aggTrade":
                 BinanceWebSocketApiProcessStreams.aggtrade(unicorn_fied_stream_data)
-            elif unicorn_fied_stream_data['event_type'] == "trade":
+            elif unicorn_fied_stream_data["event_type"] == "trade":
                 BinanceWebSocketApiProcessStreams.trade(unicorn_fied_stream_data)
-            elif unicorn_fied_stream_data['event_type'] == "kline":
+            elif unicorn_fied_stream_data["event_type"] == "kline":
                 BinanceWebSocketApiProcessStreams.kline(unicorn_fied_stream_data)
-            elif unicorn_fied_stream_data['event_type'] == "24hrMiniTicker":
+            elif unicorn_fied_stream_data["event_type"] == "24hrMiniTicker":
                 BinanceWebSocketApiProcessStreams.miniticker(unicorn_fied_stream_data)
-            elif unicorn_fied_stream_data['event_type'] == "24hrTicker":
+            elif unicorn_fied_stream_data["event_type"] == "24hrTicker":
                 BinanceWebSocketApiProcessStreams.ticker(unicorn_fied_stream_data)
-            elif unicorn_fied_stream_data['event_type'] == "depth":
+            elif unicorn_fied_stream_data["event_type"] == "depth":
                 BinanceWebSocketApiProcessStreams.miniticker(unicorn_fied_stream_data)
             else:
-                BinanceWebSocketApiProcessStreams.anything_else(unicorn_fied_stream_data)
+                BinanceWebSocketApiProcessStreams.anything_else(
+                    unicorn_fied_stream_data
+                )
         except KeyError:
             BinanceWebSocketApiProcessStreams.anything_else(unicorn_fied_stream_data)
         except TypeError:

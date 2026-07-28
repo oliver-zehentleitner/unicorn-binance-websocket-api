@@ -1,0 +1,25 @@
+name: Black
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  black:
+    runs-on: ubuntu-latest
+    steps:
+    - name: GitHub Checkout
+      uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: "3.12"
+
+    - name: Install black
+      run: pip install black==26.5.1
+
+    - name: Check formatting
+      run: black --check --diff .

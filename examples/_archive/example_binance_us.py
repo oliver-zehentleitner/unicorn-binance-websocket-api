@@ -41,26 +41,34 @@ def print_stream_data_from_stream_buffer(binance_websocket_api_manager):
     while True:
         if binance_websocket_api_manager.is_manager_stopping():
             exit(0)
-        oldest_stream_data_from_stream_buffer = binance_websocket_api_manager.pop_stream_data_from_stream_buffer()
+        oldest_stream_data_from_stream_buffer = (
+            binance_websocket_api_manager.pop_stream_data_from_stream_buffer()
+        )
         if oldest_stream_data_from_stream_buffer is None:
             time.sleep(0.01)
 
 
 logging.getLogger("unicorn_binance_websocket_api")
-logging.basicConfig(level=logging.INFO,
-                    filename=os.path.basename(__file__) + '.log',
-                    format="{asctime} [{levelname:8}] {process} {thread} {module}: {message}",
-                    style="{")
+logging.basicConfig(
+    level=logging.INFO,
+    filename=os.path.basename(__file__) + ".log",
+    format="{asctime} [{levelname:8}] {process} {thread} {module}: {message}",
+    style="{",
+)
 
 # create instance of BinanceWebSocketApiManager for Binance US
 binance_websocket_api_manager = BinanceWebSocketApiManager(exchange="binance.us")
 
-userdata_stream_id = binance_websocket_api_manager.create_stream(["arr"], ["!userData"], api_key="aaa", api_secret="bb")
+userdata_stream_id = binance_websocket_api_manager.create_stream(
+    ["arr"], ["!userData"], api_key="aaa", api_secret="bb"
+)
 
 ticker_all_stream_id = binance_websocket_api_manager.create_stream(["arr"], ["!ticker"])
-miniticker_stream_id = binance_websocket_api_manager.create_stream(["arr"], ["!miniTicker"])
+miniticker_stream_id = binance_websocket_api_manager.create_stream(
+    ["arr"], ["!miniTicker"]
+)
 
-markets = {'btcusd', 'btcxrp', 'ethusd', 'bnbusd', 'busdusd'}
+markets = {"btcusd", "btcxrp", "ethusd", "bnbusd", "busdusd"}
 
 binance_websocket_api_manager.create_stream(["aggTrade"], markets)
 binance_websocket_api_manager.create_stream(["trade"], markets)
@@ -79,12 +87,24 @@ binance_websocket_api_manager.create_stream(["depth20"], markets)
 binance_websocket_api_manager.create_stream(["aggTrade"], markets)
 
 
-channels = {'trade', 'kline_1m', 'kline_5m', 'kline_15m', 'kline_30m', 'kline_1h', 'kline_12h', 'kline_1w',
-            'miniTicker', 'depth20'}
+channels = {
+    "trade",
+    "kline_1m",
+    "kline_5m",
+    "kline_15m",
+    "kline_30m",
+    "kline_1h",
+    "kline_12h",
+    "kline_1w",
+    "miniTicker",
+    "depth20",
+}
 binance_websocket_api_manager.create_stream(channels, markets)
 
 # start a worker process to move the received stream_data from the stream_buffer to a print function
-worker_thread = threading.Thread(target=print_stream_data_from_stream_buffer, args=(binance_websocket_api_manager,))
+worker_thread = threading.Thread(
+    target=print_stream_data_from_stream_buffer, args=(binance_websocket_api_manager,)
+)
 worker_thread.start()
 
 # show an overview

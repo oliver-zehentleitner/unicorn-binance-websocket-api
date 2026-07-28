@@ -1,5 +1,6 @@
 import websocket
 
+
 def on_message(ws, message):
     print("Received message: ")
     print(message)
@@ -20,10 +21,12 @@ def on_open(ws):
 
 if __name__ == "__main__":
     websocket.enableTrace(True)
-    ws = websocket.WebSocketApp("wss://dex.binance.org/api/ws/$all@blockheight",
-                                on_open=on_open,
-                                on_message=on_message,
-                                on_error=on_error,
-                                on_close=on_close)
+    ws = websocket.WebSocketApp(
+        "wss://dex.binance.org/api/ws/$all@blockheight",
+        on_open=on_open,
+        on_message=on_message,
+        on_error=on_error,
+        on_close=on_close,
+    )
 
     ws.run_forever()
