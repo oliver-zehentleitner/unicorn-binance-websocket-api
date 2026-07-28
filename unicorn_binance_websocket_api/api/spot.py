@@ -99,37 +99,54 @@ class BinanceWebSocketApiApiSpot(object):
     def __init__(self, manager=None):
         self._manager = manager
 
-    def cancel_and_replace_order(self,
-                                 cancel_order_id: int = None,
-                                 cancel_orig_client_order_id: str = None,
-                                 cancel_new_client_order_id: str = None,
-                                 cancel_replace_mode: Optional[Literal['STOP_ON_FAILURE', 'ALLOW_FAILURE']] = "STOP_ON_FAILURE",
-                                 cancel_restrictions: Optional[Literal['ONLY_NEW', 'ONLY_PARTIALLY_FILLED']] = None,
-                                 iceberg_qty: float = None,
-                                 new_client_order_id: str = None,
-                                 new_order_resp_type: Optional[Literal['ACK', 'RESULT', 'FULL']] = None,
-                                 order_rate_limit_exceeded_mode: Optional[Literal['DO_NOTHING', 'CANCEL_ONLY']] = None,
-                                 order_type: Optional[Literal['LIMIT', 'LIMIT_MAKER', 'MARKET', 'STOP_LOSS',
-                                                              'STOP_LOSS_LIMIT', 'TAKE_PROFIT',
-                                                              'TAKE_PROFIT_LIMIT']] = None,
-                                 price: float = 0.0,
-                                 process_response=None,
-                                 quantity: float = None,
-                                 quote_order_qty: float = None,
-                                 recv_window: int = None,
-                                 request_id: str = None,
-                                 return_response: bool = False,
-                                 self_trade_prevention_mode: Optional[Literal['EXPIRE_TAKER', 'EXPIRE_MAKER',
-                                                                              'EXPIRE_BOTH', 'NONE']] = None,
-                                 side: Optional[Literal['BUY', 'SELL']] = None,
-                                 stop_price: float = None,
-                                 strategy_id: int = None,
-                                 strategy_type: int = None,
-                                 stream_id: str = None,
-                                 stream_label: str = None,
-                                 symbol: str = None,
-                                 time_in_force: Optional[Literal['GTC', 'IOC', 'FOK']] = None,
-                                 trailing_delta: int = None) -> Union[str, dict, bool, tuple]:
+    def cancel_and_replace_order(
+        self,
+        cancel_order_id: int = None,
+        cancel_orig_client_order_id: str = None,
+        cancel_new_client_order_id: str = None,
+        cancel_replace_mode: Optional[
+            Literal["STOP_ON_FAILURE", "ALLOW_FAILURE"]
+        ] = "STOP_ON_FAILURE",
+        cancel_restrictions: Optional[
+            Literal["ONLY_NEW", "ONLY_PARTIALLY_FILLED"]
+        ] = None,
+        iceberg_qty: float = None,
+        new_client_order_id: str = None,
+        new_order_resp_type: Optional[Literal["ACK", "RESULT", "FULL"]] = None,
+        order_rate_limit_exceeded_mode: Optional[
+            Literal["DO_NOTHING", "CANCEL_ONLY"]
+        ] = None,
+        order_type: Optional[
+            Literal[
+                "LIMIT",
+                "LIMIT_MAKER",
+                "MARKET",
+                "STOP_LOSS",
+                "STOP_LOSS_LIMIT",
+                "TAKE_PROFIT",
+                "TAKE_PROFIT_LIMIT",
+            ]
+        ] = None,
+        price: float = 0.0,
+        process_response=None,
+        quantity: float = None,
+        quote_order_qty: float = None,
+        recv_window: int = None,
+        request_id: str = None,
+        return_response: bool = False,
+        self_trade_prevention_mode: Optional[
+            Literal["EXPIRE_TAKER", "EXPIRE_MAKER", "EXPIRE_BOTH", "NONE"]
+        ] = None,
+        side: Optional[Literal["BUY", "SELL"]] = None,
+        stop_price: float = None,
+        strategy_id: int = None,
+        strategy_type: int = None,
+        stream_id: str = None,
+        stream_label: str = None,
+        symbol: str = None,
+        time_in_force: Optional[Literal["GTC", "IOC", "FOK"]] = None,
+        trailing_delta: int = None,
+    ) -> Union[str, dict, bool, tuple]:
         """
         Cancel and replace order (TRADE)
 
@@ -363,116 +380,154 @@ class BinanceWebSocketApiApiSpot(object):
               ]
             }
         """
-        if (cancel_replace_mode is None or
-                quantity is None or
-                side is None or
-                symbol is None or
-                order_type is None or
-                (cancel_order_id is None and cancel_orig_client_order_id is None)):
-            raise ValueError(f"Missing mandatory parameter: cancel_replace_mode, quantity, side, symbol, order_type,"
-                             f"cancel_order_id/cancel_orig_client_order_id")
+        if (
+            cancel_replace_mode is None
+            or quantity is None
+            or side is None
+            or symbol is None
+            or order_type is None
+            or (cancel_order_id is None and cancel_orig_client_order_id is None)
+        ):
+            raise ValueError(
+                f"Missing mandatory parameter: cancel_replace_mode, quantity, side, symbol, order_type,"
+                f"cancel_order_id/cancel_orig_client_order_id"
+            )
 
         if stream_id is None:
             if stream_label is not None:
-                stream_id = self._manager.get_stream_id_by_label(stream_label=stream_label)
+                stream_id = self._manager.get_stream_id_by_label(
+                    stream_label=stream_label
+                )
             else:
                 stream_id = self._manager.get_the_one_active_websocket_api()
             if stream_id is None:
-                logger.critical(f"BinanceWebSocketApiApiSpot.cancel_and_replace_order() - error_msg: No `stream_id` "
-                                f"provided or found!")
+                logger.critical(
+                    f"BinanceWebSocketApiApiSpot.cancel_and_replace_order() - error_msg: No `stream_id` "
+                    f"provided or found!"
+                )
                 return False
 
-        new_client_order_id = new_client_order_id if new_client_order_id is not None else str(self._manager.get_request_id())
-        params = {"apiKey": self._manager.stream_list[stream_id]['api_key'],
-                  "cancelReplaceMode": cancel_replace_mode,
-                  "side": side.upper(),
-                  "symbol": symbol.upper(),
-                  "timestamp": self._manager.get_timestamp(),
-                  "type": order_type}
+        new_client_order_id = (
+            new_client_order_id
+            if new_client_order_id is not None
+            else str(self._manager.get_request_id())
+        )
+        params = {
+            "apiKey": self._manager.stream_list[stream_id]["api_key"],
+            "cancelReplaceMode": cancel_replace_mode,
+            "side": side.upper(),
+            "symbol": symbol.upper(),
+            "timestamp": self._manager.get_timestamp(),
+            "type": order_type,
+        }
 
         if cancel_order_id is not None:
-            params['cancelOrderId'] = int(cancel_order_id)
+            params["cancelOrderId"] = int(cancel_order_id)
         if cancel_orig_client_order_id is not None:
-            params['cancelOrigClientOrderId'] = str(cancel_orig_client_order_id)
+            params["cancelOrigClientOrderId"] = str(cancel_orig_client_order_id)
         if cancel_new_client_order_id is not None:
-            params['cancelNewClientOrderId'] = str(cancel_new_client_order_id)
+            params["cancelNewClientOrderId"] = str(cancel_new_client_order_id)
         if cancel_restrictions is not None:
-            params['cancelRestrictions'] = cancel_restrictions
+            params["cancelRestrictions"] = cancel_restrictions
         if iceberg_qty is not None:
-            params['icebergQty'] = format(Decimal(repr(iceberg_qty)), 'f')
+            params["icebergQty"] = format(Decimal(repr(iceberg_qty)), "f")
         if new_client_order_id is not None:
-            params['NewClientOrderId'] = new_client_order_id
+            params["NewClientOrderId"] = new_client_order_id
         if new_order_resp_type is not None:
-            params['newOrderRespType'] = new_order_resp_type
+            params["newOrderRespType"] = new_order_resp_type
         if order_rate_limit_exceeded_mode is not None:
-            params['orderRateLimitExceededMode'] = order_rate_limit_exceeded_mode
-        if (order_type.upper() == "LIMIT" or
-                order_type.upper() == "LIMIT_MAKER" or
-                order_type.upper() == "STOP_LOSS_LIMIT" or
-                order_type.upper() == "TAKE_PROFIT_LIMIT"):
-            params['price'] = format(Decimal(repr(price)), 'f')
-        if (order_type.upper() == "LIMIT" or
-                order_type.upper() == "STOP_LOSS_LIMIT" or
-                order_type.upper() == "TAKE_PROFIT_LIMIT"):
-            params['timeInForce'] = time_in_force
+            params["orderRateLimitExceededMode"] = order_rate_limit_exceeded_mode
+        if (
+            order_type.upper() == "LIMIT"
+            or order_type.upper() == "LIMIT_MAKER"
+            or order_type.upper() == "STOP_LOSS_LIMIT"
+            or order_type.upper() == "TAKE_PROFIT_LIMIT"
+        ):
+            params["price"] = format(Decimal(repr(price)), "f")
+        if (
+            order_type.upper() == "LIMIT"
+            or order_type.upper() == "STOP_LOSS_LIMIT"
+            or order_type.upper() == "TAKE_PROFIT_LIMIT"
+        ):
+            params["timeInForce"] = time_in_force
         if quantity is not None:
-            params['quantity'] = format(Decimal(repr(quantity)), 'f')
+            params["quantity"] = format(Decimal(repr(quantity)), "f")
         if quote_order_qty is not None:
-            params['quoteOrderQty'] = format(Decimal(repr(quote_order_qty)), 'f')
+            params["quoteOrderQty"] = format(Decimal(repr(quote_order_qty)), "f")
             if quantity is not None:
-                logger.warning(f"BinanceWebSocketApiApiSpot.cancel_and_replace_order() - error_msg: By using the "
-                               f"parameter `quoteOrderQty` the use of `quantity` is suppressed!")
-            del params['quantity']
+                logger.warning(
+                    f"BinanceWebSocketApiApiSpot.cancel_and_replace_order() - error_msg: By using the "
+                    f"parameter `quoteOrderQty` the use of `quantity` is suppressed!"
+                )
+            del params["quantity"]
         if recv_window is not None:
-            params['recvWindow'] = str(recv_window)
+            params["recvWindow"] = str(recv_window)
         if self_trade_prevention_mode is not None:
-            params['selfTradePreventionMode'] = self_trade_prevention_mode
+            params["selfTradePreventionMode"] = self_trade_prevention_mode
         if stop_price is not None:
-            params['stopPrice'] = format(Decimal(repr(stop_price)), 'f')
+            params["stopPrice"] = format(Decimal(repr(stop_price)), "f")
             if trailing_delta is not None:
-                logger.warning(f"BinanceWebSocketApiApiSpot.cancel_and_replace_order() - error_msg: By using the "
-                               f"parameter `stopPrice` the use of `trailingDelta` is suppressed!")
+                logger.warning(
+                    f"BinanceWebSocketApiApiSpot.cancel_and_replace_order() - error_msg: By using the "
+                    f"parameter `stopPrice` the use of `trailingDelta` is suppressed!"
+                )
         elif trailing_delta is not None:
-            params['trailingDelta'] = str(trailing_delta)
+            params["trailingDelta"] = str(trailing_delta)
         if strategy_id is not None:
-            params['strategyId'] = str(strategy_id)
+            params["strategyId"] = str(strategy_id)
         if strategy_type is not None:
-            params['strategyType'] = str(strategy_type)
+            params["strategyType"] = str(strategy_type)
 
         method = "order.cancelReplace"
-        api_secret = self._manager.stream_list[stream_id]['api_secret']
-        request_id = self._manager.get_new_uuid_id() if request_id is None else request_id
-        params['signature'] = self._manager.generate_signature(api_secret=api_secret, data=params)
+        api_secret = self._manager.stream_list[stream_id]["api_secret"]
+        request_id = (
+            self._manager.get_new_uuid_id() if request_id is None else request_id
+        )
+        params["signature"] = self._manager.generate_signature(
+            api_secret=api_secret, data=params
+        )
 
-        payload = {"id": request_id,
-                   "method": method,
-                   "params": params}
+        payload = {"id": request_id, "method": method, "params": params}
 
-        logger.debug(f"BinanceWebSocketApiApiSpot.cancel_and_replace_order() - Created payload: {payload}")
+        logger.debug(
+            f"BinanceWebSocketApiApiSpot.cancel_and_replace_order() - Created payload: {payload}"
+        )
 
-        if self._manager.send_with_stream(stream_id=stream_id, payload=payload) is False:
+        if (
+            self._manager.send_with_stream(stream_id=stream_id, payload=payload)
+            is False
+        ):
             self._manager.add_payload_to_stream(stream_id=stream_id, payload=payload)
 
         if process_response is not None:
             with self._manager.process_response_lock:
-                entry = {'callback_function': process_response}
+                entry = {"callback_function": process_response}
                 self._manager.process_response[request_id] = entry
 
         if return_response is True:
             with self._manager.return_response_lock:
-                entry = {'event_return_response': threading.Event()}
+                entry = {"event_return_response": threading.Event()}
                 self._manager.return_response[request_id] = entry
-            self._manager.return_response[request_id]['event_return_response'].wait()
+            self._manager.return_response[request_id]["event_return_response"].wait()
             with self._manager.return_response_lock:
-                response_value = self._manager.return_response[request_id]['response_value']
+                response_value = self._manager.return_response[request_id][
+                    "response_value"
+                ]
                 del self._manager.return_response[request_id]
             return new_client_order_id, response_value
 
         return new_client_order_id
 
-    def cancel_open_orders(self, process_response=None, return_response: bool = False, symbol: str = None,
-                           recv_window: int = None, request_id: str = None, stream_id: str = None,
-                           stream_label: str = None) -> Union[str, dict, bool]:
+    def cancel_open_orders(
+        self,
+        process_response=None,
+        return_response: bool = False,
+        symbol: str = None,
+        recv_window: int = None,
+        request_id: str = None,
+        stream_id: str = None,
+        stream_label: str = None,
+    ) -> Union[str, dict, bool]:
         """
         Cancel open orders (TRADE)
 
@@ -622,57 +677,83 @@ class BinanceWebSocketApiApiSpot(object):
 
         if stream_id is None:
             if stream_label is not None:
-                stream_id = self._manager.get_stream_id_by_label(stream_label=stream_label)
+                stream_id = self._manager.get_stream_id_by_label(
+                    stream_label=stream_label
+                )
             else:
                 stream_id = self._manager.get_the_one_active_websocket_api()
             if stream_id is None:
-                logger.critical(f"BinanceWebSocketApiApiSpot.cancel_open_orders() - error_msg: No `stream_id` provided"
-                                f" or found!")
+                logger.critical(
+                    f"BinanceWebSocketApiApiSpot.cancel_open_orders() - error_msg: No `stream_id` provided"
+                    f" or found!"
+                )
                 return False
 
-        params = {"apiKey": self._manager.stream_list[stream_id]['api_key'],
-                  "symbol": symbol.upper(),
-                  "timestamp": self._manager.get_timestamp()}
+        params = {
+            "apiKey": self._manager.stream_list[stream_id]["api_key"],
+            "symbol": symbol.upper(),
+            "timestamp": self._manager.get_timestamp(),
+        }
 
         if recv_window is not None:
-            params['recvWindow'] = str(recv_window)
+            params["recvWindow"] = str(recv_window)
 
         method = "openOrders.cancelAll"
-        api_secret = self._manager.stream_list[stream_id]['api_secret']
-        request_id = self._manager.get_new_uuid_id() if request_id is None else request_id
-        params['signature'] = self._manager.generate_signature(api_secret=api_secret, data=params)
+        api_secret = self._manager.stream_list[stream_id]["api_secret"]
+        request_id = (
+            self._manager.get_new_uuid_id() if request_id is None else request_id
+        )
+        params["signature"] = self._manager.generate_signature(
+            api_secret=api_secret, data=params
+        )
 
-        payload = {"id": request_id,
-                   "method": method,
-                   "params": params}
+        payload = {"id": request_id, "method": method, "params": params}
 
-        logger.debug(f"BinanceWebSocketApiApiSpot.cancel_open_orders() - Created payload: {payload}")
+        logger.debug(
+            f"BinanceWebSocketApiApiSpot.cancel_open_orders() - Created payload: {payload}"
+        )
 
-        if self._manager.send_with_stream(stream_id=stream_id, payload=payload) is False:
+        if (
+            self._manager.send_with_stream(stream_id=stream_id, payload=payload)
+            is False
+        ):
             self._manager.add_payload_to_stream(stream_id=stream_id, payload=payload)
 
         if process_response is not None:
             with self._manager.process_response_lock:
-                entry = {'callback_function': process_response}
+                entry = {"callback_function": process_response}
                 self._manager.process_response[request_id] = entry
 
         if return_response is True:
             with self._manager.return_response_lock:
-                entry = {'event_return_response': threading.Event()}
+                entry = {"event_return_response": threading.Event()}
                 self._manager.return_response[request_id] = entry
-            self._manager.return_response[request_id]['event_return_response'].wait()
+            self._manager.return_response[request_id]["event_return_response"].wait()
             with self._manager.return_response_lock:
-                response_value = self._manager.return_response[request_id]['response_value']
+                response_value = self._manager.return_response[request_id][
+                    "response_value"
+                ]
                 del self._manager.return_response[request_id]
             return response_value
 
         return True
 
-    def cancel_order(self, cancel_restrictions: Optional[Literal['ONLY_NEW', 'ONLY_PARTIALLY_FILLED']] = None,
-                     new_client_order_id: str = None, order_id: int = None, orig_client_order_id: str = None,
-                     process_response=None, recv_window: int = None, request_id: str = None,
-                     return_response: bool = False, stream_id: str = None, symbol: str = None,
-                     stream_label: str = None) -> Union[str, dict, bool]:
+    def cancel_order(
+        self,
+        cancel_restrictions: Optional[
+            Literal["ONLY_NEW", "ONLY_PARTIALLY_FILLED"]
+        ] = None,
+        new_client_order_id: str = None,
+        order_id: int = None,
+        orig_client_order_id: str = None,
+        process_response=None,
+        recv_window: int = None,
+        request_id: str = None,
+        return_response: bool = False,
+        stream_id: str = None,
+        symbol: str = None,
+        stream_label: str = None,
+    ) -> Union[str, dict, bool]:
         """
         Cancel order (TRADE)
 
@@ -788,89 +869,118 @@ class BinanceWebSocketApiApiSpot(object):
             }
         """
         if symbol is None or (order_id is None and orig_client_order_id is None):
-            raise ValueError(f"Missing mandatory parameter: symbol, order_id/orig_client_order_id")
+            raise ValueError(
+                f"Missing mandatory parameter: symbol, order_id/orig_client_order_id"
+            )
 
         if stream_id is None:
             if stream_label is not None:
-                stream_id = self._manager.get_stream_id_by_label(stream_label=stream_label)
+                stream_id = self._manager.get_stream_id_by_label(
+                    stream_label=stream_label
+                )
             else:
                 stream_id = self._manager.get_the_one_active_websocket_api()
             if stream_id is None:
-                logger.critical(f"BinanceWebSocketApiApiSpot.cancel_order() - error_msg: No `stream_id` provided or "
-                                f"found!")
+                logger.critical(
+                    f"BinanceWebSocketApiApiSpot.cancel_order() - error_msg: No `stream_id` provided or "
+                    f"found!"
+                )
                 return False
 
-        params = {"apiKey": self._manager.stream_list[stream_id]['api_key'],
-                  "symbol": symbol.upper(),
-                  "timestamp": self._manager.get_timestamp()}
+        params = {
+            "apiKey": self._manager.stream_list[stream_id]["api_key"],
+            "symbol": symbol.upper(),
+            "timestamp": self._manager.get_timestamp(),
+        }
 
         if cancel_restrictions is not None:
-            params['cancelRestrictions'] = cancel_restrictions
+            params["cancelRestrictions"] = cancel_restrictions
         if new_client_order_id is not None:
-            params['newClientOrderId'] = new_client_order_id
+            params["newClientOrderId"] = new_client_order_id
         if order_id is not None:
-            params['orderId'] = int(order_id)
+            params["orderId"] = int(order_id)
         if orig_client_order_id is not None:
-            params['origClientOrderId'] = str(orig_client_order_id)
+            params["origClientOrderId"] = str(orig_client_order_id)
         if recv_window is not None:
-            params['recvWindow'] = str(recv_window)
+            params["recvWindow"] = str(recv_window)
 
         method = "order.cancel"
-        api_secret = self._manager.stream_list[stream_id]['api_secret']
-        request_id = self._manager.get_new_uuid_id() if request_id is None else request_id
-        params['signature'] = self._manager.generate_signature(api_secret=api_secret, data=params)
+        api_secret = self._manager.stream_list[stream_id]["api_secret"]
+        request_id = (
+            self._manager.get_new_uuid_id() if request_id is None else request_id
+        )
+        params["signature"] = self._manager.generate_signature(
+            api_secret=api_secret, data=params
+        )
 
-        payload = {"id": request_id,
-                   "method": method,
-                   "params": params}
+        payload = {"id": request_id, "method": method, "params": params}
 
-        logger.debug(f"BinanceWebSocketApiApiSpot.cancel_order() - Created payload: {payload}")
+        logger.debug(
+            f"BinanceWebSocketApiApiSpot.cancel_order() - Created payload: {payload}"
+        )
 
-        if self._manager.send_with_stream(stream_id=stream_id, payload=payload) is False:
+        if (
+            self._manager.send_with_stream(stream_id=stream_id, payload=payload)
+            is False
+        ):
             self._manager.add_payload_to_stream(stream_id=stream_id, payload=payload)
 
         if process_response is not None:
             with self._manager.process_response_lock:
-                entry = {'callback_function': process_response}
+                entry = {"callback_function": process_response}
                 self._manager.process_response[request_id] = entry
 
         if return_response is True:
             with self._manager.return_response_lock:
-                entry = {'event_return_response': threading.Event()}
+                entry = {"event_return_response": threading.Event()}
                 self._manager.return_response[request_id] = entry
-            self._manager.return_response[request_id]['event_return_response'].wait()
+            self._manager.return_response[request_id]["event_return_response"].wait()
             with self._manager.return_response_lock:
-                response_value = self._manager.return_response[request_id]['response_value']
+                response_value = self._manager.return_response[request_id][
+                    "response_value"
+                ]
                 del self._manager.return_response[request_id]
             return response_value
 
         return True
 
-    def create_order(self,
-                     iceberg_qty: float = None,
-                     new_client_order_id: str = None,
-                     new_order_resp_type: Optional[Literal['ACK', 'RESULT', 'FULL']] = None,
-                     order_type: Optional[Literal['LIMIT', 'LIMIT_MAKER', 'MARKET', 'STOP_LOSS', 'STOP_LOSS_LIMIT',
-                                                  'TAKE_PROFIT', 'TAKE_PROFIT_LIMIT']] = None,
-                     price: float = 0.0,
-                     process_response=None,
-                     quantity: float = None,
-                     quote_order_qty: float = None,
-                     recv_window: int = None,
-                     request_id: str = None,
-                     return_response: bool = False,
-                     self_trade_prevention_mode: Optional[Literal['EXPIRE_TAKER', 'EXPIRE_MAKER',
-                                                                  'EXPIRE_BOTH', 'NONE']] = None,
-                     side: Optional[Literal['BUY', 'SELL']] = None,
-                     stop_price: float = None,
-                     strategy_id: int = None,
-                     strategy_type: int = None,
-                     stream_id: str = None,
-                     stream_label: str = None,
-                     symbol: str = None,
-                     time_in_force: Optional[Literal['GTC', 'IOC', 'FOK']] = None,
-                     test: bool = False,
-                     trailing_delta: int = None) -> Union[str, dict, bool, tuple]:
+    def create_order(
+        self,
+        iceberg_qty: float = None,
+        new_client_order_id: str = None,
+        new_order_resp_type: Optional[Literal["ACK", "RESULT", "FULL"]] = None,
+        order_type: Optional[
+            Literal[
+                "LIMIT",
+                "LIMIT_MAKER",
+                "MARKET",
+                "STOP_LOSS",
+                "STOP_LOSS_LIMIT",
+                "TAKE_PROFIT",
+                "TAKE_PROFIT_LIMIT",
+            ]
+        ] = None,
+        price: float = 0.0,
+        process_response=None,
+        quantity: float = None,
+        quote_order_qty: float = None,
+        recv_window: int = None,
+        request_id: str = None,
+        return_response: bool = False,
+        self_trade_prevention_mode: Optional[
+            Literal["EXPIRE_TAKER", "EXPIRE_MAKER", "EXPIRE_BOTH", "NONE"]
+        ] = None,
+        side: Optional[Literal["BUY", "SELL"]] = None,
+        stop_price: float = None,
+        strategy_id: int = None,
+        strategy_type: int = None,
+        stream_id: str = None,
+        stream_label: str = None,
+        symbol: str = None,
+        time_in_force: Optional[Literal["GTC", "IOC", "FOK"]] = None,
+        test: bool = False,
+        trailing_delta: int = None,
+    ) -> Union[str, dict, bool, tuple]:
         """
         Place new order (TRADE)
 
@@ -1041,113 +1151,153 @@ class BinanceWebSocketApiApiSpot(object):
 
         if stream_id is None:
             if stream_label is not None:
-                stream_id = self._manager.get_stream_id_by_label(stream_label=stream_label)
+                stream_id = self._manager.get_stream_id_by_label(
+                    stream_label=stream_label
+                )
             else:
                 stream_id = self._manager.get_the_one_active_websocket_api()
             if stream_id is None:
-                logger.critical(f"BinanceWebSocketApiApiSpot.create_order() - error_msg: No `stream_id` provided or "
-                                f"found!")
+                logger.critical(
+                    f"BinanceWebSocketApiApiSpot.create_order() - error_msg: No `stream_id` provided or "
+                    f"found!"
+                )
                 return False
 
-        new_client_order_id = new_client_order_id if new_client_order_id is not None else str(self._manager.get_request_id())
-        params = {"apiKey": self._manager.stream_list[stream_id]['api_key'],
-                  "newClientOrderId": new_client_order_id,
-                  "side": side.upper(),
-                  "symbol": symbol.upper(),
-                  "timestamp": self._manager.get_timestamp(),
-                  "type": order_type}
+        new_client_order_id = (
+            new_client_order_id
+            if new_client_order_id is not None
+            else str(self._manager.get_request_id())
+        )
+        params = {
+            "apiKey": self._manager.stream_list[stream_id]["api_key"],
+            "newClientOrderId": new_client_order_id,
+            "side": side.upper(),
+            "symbol": symbol.upper(),
+            "timestamp": self._manager.get_timestamp(),
+            "type": order_type,
+        }
 
         if iceberg_qty is not None:
-            params['icebergQty'] = format(Decimal(repr(iceberg_qty)), 'f')
+            params["icebergQty"] = format(Decimal(repr(iceberg_qty)), "f")
         if new_order_resp_type is not None:
-            params['newOrderRespType'] = new_order_resp_type
-        if (order_type.upper() == "LIMIT" or
-                order_type.upper() == "LIMIT_MAKER" or
-                order_type.upper() == "STOP_LOSS_LIMIT" or
-                order_type.upper() == "TAKE_PROFIT_LIMIT"):
-            params['price'] = format(Decimal(repr(price)), 'f')
-        if (order_type.upper() == "LIMIT" or
-                order_type.upper() == "STOP_LOSS_LIMIT" or
-                order_type.upper() == "TAKE_PROFIT_LIMIT"):
-            params['timeInForce'] = time_in_force
+            params["newOrderRespType"] = new_order_resp_type
+        if (
+            order_type.upper() == "LIMIT"
+            or order_type.upper() == "LIMIT_MAKER"
+            or order_type.upper() == "STOP_LOSS_LIMIT"
+            or order_type.upper() == "TAKE_PROFIT_LIMIT"
+        ):
+            params["price"] = format(Decimal(repr(price)), "f")
+        if (
+            order_type.upper() == "LIMIT"
+            or order_type.upper() == "STOP_LOSS_LIMIT"
+            or order_type.upper() == "TAKE_PROFIT_LIMIT"
+        ):
+            params["timeInForce"] = time_in_force
         if quantity is not None:
-            params['quantity'] = format(Decimal(repr(quantity)), 'f')
+            params["quantity"] = format(Decimal(repr(quantity)), "f")
         if quote_order_qty is not None:
-            params['quoteOrderQty'] = format(Decimal(repr(quote_order_qty)), 'f')
+            params["quoteOrderQty"] = format(Decimal(repr(quote_order_qty)), "f")
             if quantity is not None:
-                logger.warning(f"BinanceWebSocketApiApiSpot.create_order() - error_msg: By using the parameter "
-                               f"`quoteOrderQty` the use of `quantity` is suppressed!")
-            del params['quantity']
+                logger.warning(
+                    f"BinanceWebSocketApiApiSpot.create_order() - error_msg: By using the parameter "
+                    f"`quoteOrderQty` the use of `quantity` is suppressed!"
+                )
+            del params["quantity"]
         if recv_window is not None:
-            params['recvWindow'] = str(recv_window)
+            params["recvWindow"] = str(recv_window)
         if self_trade_prevention_mode is not None:
-            params['selfTradePreventionMode'] = self_trade_prevention_mode
+            params["selfTradePreventionMode"] = self_trade_prevention_mode
         if stop_price is not None:
-            params['stopPrice'] = format(Decimal(repr(stop_price)), 'f')
+            params["stopPrice"] = format(Decimal(repr(stop_price)), "f")
             if trailing_delta is not None:
-                logger.warning(f"BinanceWebSocketApiApiSpot.create_order() - error_msg: By using the parameter "
-                               f"`stopPrice` the use of `trailingDelta` is suppressed!")
+                logger.warning(
+                    f"BinanceWebSocketApiApiSpot.create_order() - error_msg: By using the parameter "
+                    f"`stopPrice` the use of `trailingDelta` is suppressed!"
+                )
         elif trailing_delta is not None:
-            params['trailingDelta'] = str(trailing_delta)
+            params["trailingDelta"] = str(trailing_delta)
         if strategy_id is not None:
-            params['strategyId'] = str(strategy_id)
+            params["strategyId"] = str(strategy_id)
         if strategy_type is not None:
-            params['strategyType'] = str(strategy_type)
+            params["strategyType"] = str(strategy_type)
 
         method = "order.test" if test is True else "order.place"
-        api_secret = self._manager.stream_list[stream_id]['api_secret']
-        request_id = self._manager.get_new_uuid_id() if request_id is None else request_id
-        params['signature'] = self._manager.generate_signature(api_secret=api_secret, data=params)
+        api_secret = self._manager.stream_list[stream_id]["api_secret"]
+        request_id = (
+            self._manager.get_new_uuid_id() if request_id is None else request_id
+        )
+        params["signature"] = self._manager.generate_signature(
+            api_secret=api_secret, data=params
+        )
 
-        payload = {"id": request_id,
-                   "method": method,
-                   "params": params}
+        payload = {"id": request_id, "method": method, "params": params}
 
-        logger.debug(f"BinanceWebSocketApiApiSpot.create_order() - Created payload: {payload}")
+        logger.debug(
+            f"BinanceWebSocketApiApiSpot.create_order() - Created payload: {payload}"
+        )
 
-        if self._manager.send_with_stream(stream_id=stream_id, payload=payload) is False:
+        if (
+            self._manager.send_with_stream(stream_id=stream_id, payload=payload)
+            is False
+        ):
             self._manager.add_payload_to_stream(stream_id=stream_id, payload=payload)
 
         if process_response is not None:
             with self._manager.process_response_lock:
-                entry = {'callback_function': process_response}
+                entry = {"callback_function": process_response}
                 self._manager.process_response[request_id] = entry
 
         if return_response is True:
             with self._manager.return_response_lock:
-                entry = {'event_return_response': threading.Event()}
+                entry = {"event_return_response": threading.Event()}
                 self._manager.return_response[request_id] = entry
-            self._manager.return_response[request_id]['event_return_response'].wait()
+            self._manager.return_response[request_id]["event_return_response"].wait()
             with self._manager.return_response_lock:
-                response_value = self._manager.return_response[request_id]['response_value']
+                response_value = self._manager.return_response[request_id][
+                    "response_value"
+                ]
                 del self._manager.return_response[request_id]
             return new_client_order_id, response_value
 
         return new_client_order_id
 
-    def create_test_order(self, iceberg_qty: float = None,
-                          new_client_order_id: str = None,
-                          new_order_resp_type: Optional[Literal['ACK', 'RESULT', 'FULL']] = None,
-                          order_type: Optional[Literal['LIMIT', 'LIMIT_MAKER', 'MARKET', 'STOP_LOSS', 'STOP_LOSS_LIMIT',
-                                                       'TAKE_PROFIT', 'TAKE_PROFIT_LIMIT']] = None,
-                          price: float = 0.0,
-                          process_response=None,
-                          quantity: float = None,
-                          quote_order_qty: float = None,
-                          recv_window: int = None,
-                          request_id: str = None,
-                          return_response: bool = False,
-                          self_trade_prevention_mode: Optional[Literal['EXPIRE_TAKER', 'EXPIRE_MAKER',
-                                                                       'EXPIRE_BOTH', 'NONE']] = None,
-                          side: Optional[Literal['BUY', 'SELL']] = None,
-                          stop_price: float = None,
-                          strategy_id: int = None,
-                          strategy_type: int = None,
-                          stream_id: str = None,
-                          stream_label: str = None,
-                          symbol: str = None,
-                          time_in_force: Optional[Literal['GTC', 'IOC', 'FOK']] = None,
-                          trailing_delta: int = None) -> Union[str, dict, bool, tuple]:
+    def create_test_order(
+        self,
+        iceberg_qty: float = None,
+        new_client_order_id: str = None,
+        new_order_resp_type: Optional[Literal["ACK", "RESULT", "FULL"]] = None,
+        order_type: Optional[
+            Literal[
+                "LIMIT",
+                "LIMIT_MAKER",
+                "MARKET",
+                "STOP_LOSS",
+                "STOP_LOSS_LIMIT",
+                "TAKE_PROFIT",
+                "TAKE_PROFIT_LIMIT",
+            ]
+        ] = None,
+        price: float = 0.0,
+        process_response=None,
+        quantity: float = None,
+        quote_order_qty: float = None,
+        recv_window: int = None,
+        request_id: str = None,
+        return_response: bool = False,
+        self_trade_prevention_mode: Optional[
+            Literal["EXPIRE_TAKER", "EXPIRE_MAKER", "EXPIRE_BOTH", "NONE"]
+        ] = None,
+        side: Optional[Literal["BUY", "SELL"]] = None,
+        stop_price: float = None,
+        strategy_id: int = None,
+        strategy_type: int = None,
+        stream_id: str = None,
+        stream_label: str = None,
+        symbol: str = None,
+        time_in_force: Optional[Literal["GTC", "IOC", "FOK"]] = None,
+        trailing_delta: int = None,
+    ) -> Union[str, dict, bool, tuple]:
         """
         Test new order (TRADE)
 
@@ -1312,18 +1462,40 @@ class BinanceWebSocketApiApiSpot(object):
                 ]
             }
         """
-        return self.create_order(iceberg_qty=iceberg_qty, new_client_order_id=new_client_order_id,
-                                 new_order_resp_type=new_order_resp_type, price=price, order_type=order_type,
-                                 process_response=process_response, quantity=quantity, quote_order_qty=quote_order_qty,
-                                 recv_window=recv_window, request_id=request_id, return_response=return_response,
-                                 self_trade_prevention_mode=self_trade_prevention_mode, side=side,
-                                 stop_price=stop_price, strategy_id=strategy_id, strategy_type=strategy_type,
-                                 stream_id=stream_id, stream_label=stream_label, symbol=symbol,
-                                 time_in_force=time_in_force, test=True, trailing_delta=trailing_delta)
+        return self.create_order(
+            iceberg_qty=iceberg_qty,
+            new_client_order_id=new_client_order_id,
+            new_order_resp_type=new_order_resp_type,
+            price=price,
+            order_type=order_type,
+            process_response=process_response,
+            quantity=quantity,
+            quote_order_qty=quote_order_qty,
+            recv_window=recv_window,
+            request_id=request_id,
+            return_response=return_response,
+            self_trade_prevention_mode=self_trade_prevention_mode,
+            side=side,
+            stop_price=stop_price,
+            strategy_id=strategy_id,
+            strategy_type=strategy_type,
+            stream_id=stream_id,
+            stream_label=stream_label,
+            symbol=symbol,
+            time_in_force=time_in_force,
+            test=True,
+            trailing_delta=trailing_delta,
+        )
 
-    def get_account_status(self, process_response=None, recv_window: int = None, request_id: str = None,
-                           return_response: bool = False, stream_id: str = None, stream_label: str = None) \
-            -> Union[str, dict, bool]:
+    def get_account_status(
+        self,
+        process_response=None,
+        recv_window: int = None,
+        request_id: str = None,
+        return_response: bool = False,
+        stream_id: str = None,
+        stream_label: str = None,
+    ) -> Union[str, dict, bool]:
         """
         Account information (USER_DATA)
 
@@ -1426,55 +1598,79 @@ class BinanceWebSocketApiApiSpot(object):
         """
         if stream_id is None:
             if stream_label is not None:
-                stream_id = self._manager.get_stream_id_by_label(stream_label=stream_label)
+                stream_id = self._manager.get_stream_id_by_label(
+                    stream_label=stream_label
+                )
             else:
                 stream_id = self._manager.get_the_one_active_websocket_api()
             if stream_id is None:
-                logger.critical(f"BinanceWebSocketApiApiSpot.get_account_status() - error_msg: No `stream_id` provided"
-                                f" or found!")
+                logger.critical(
+                    f"BinanceWebSocketApiApiSpot.get_account_status() - error_msg: No `stream_id` provided"
+                    f" or found!"
+                )
                 return False
 
-        params = {"apiKey": self._manager.stream_list[stream_id]['api_key'],
-                  "timestamp": self._manager.get_timestamp()}
+        params = {
+            "apiKey": self._manager.stream_list[stream_id]["api_key"],
+            "timestamp": self._manager.get_timestamp(),
+        }
 
         if recv_window is not None:
-            params['recvWindow'] = str(recv_window)
+            params["recvWindow"] = str(recv_window)
 
         method = "account.status"
-        api_secret = self._manager.stream_list[stream_id]['api_secret']
-        request_id = self._manager.get_new_uuid_id() if request_id is None else request_id
-        params['signature'] = self._manager.generate_signature(api_secret=api_secret, data=params)
+        api_secret = self._manager.stream_list[stream_id]["api_secret"]
+        request_id = (
+            self._manager.get_new_uuid_id() if request_id is None else request_id
+        )
+        params["signature"] = self._manager.generate_signature(
+            api_secret=api_secret, data=params
+        )
 
-        payload = {"id": request_id,
-                   "method": method,
-                   "params": params}
+        payload = {"id": request_id, "method": method, "params": params}
 
-        logger.debug(f"BinanceWebSocketApiApiSpot.get_account_status() - Created payload: {payload}")
+        logger.debug(
+            f"BinanceWebSocketApiApiSpot.get_account_status() - Created payload: {payload}"
+        )
 
-        if self._manager.send_with_stream(stream_id=stream_id, payload=payload) is False:
+        if (
+            self._manager.send_with_stream(stream_id=stream_id, payload=payload)
+            is False
+        ):
             self._manager.add_payload_to_stream(stream_id=stream_id, payload=payload)
 
         if process_response is not None:
             with self._manager.process_response_lock:
-                entry = {'callback_function': process_response}
+                entry = {"callback_function": process_response}
                 self._manager.process_response[request_id] = entry
 
         if return_response is True:
             with self._manager.return_response_lock:
-                entry = {'event_return_response': threading.Event()}
+                entry = {"event_return_response": threading.Event()}
                 self._manager.return_response[request_id] = entry
-            self._manager.return_response[request_id]['event_return_response'].wait()
+            self._manager.return_response[request_id]["event_return_response"].wait()
             with self._manager.return_response_lock:
-                response_value = self._manager.return_response[request_id]['response_value']
+                response_value = self._manager.return_response[request_id][
+                    "response_value"
+                ]
                 del self._manager.return_response[request_id]
             return response_value
 
         return True
 
-    def get_aggregate_trades(self, process_response=None, end_time: int = None, from_id: int = None, limit: int = None,
-                             request_id: str = None, return_response: bool = False, start_time: int = None,
-                             stream_id: str = None, stream_label: str = None, symbol: str = None) \
-            -> Union[str, dict, bool]:
+    def get_aggregate_trades(
+        self,
+        process_response=None,
+        end_time: int = None,
+        from_id: int = None,
+        limit: int = None,
+        request_id: str = None,
+        return_response: bool = False,
+        start_time: int = None,
+        stream_id: str = None,
+        stream_label: str = None,
+        symbol: str = None,
+    ) -> Union[str, dict, bool]:
         """
         Aggregate trades
 
@@ -1571,57 +1767,73 @@ class BinanceWebSocketApiApiSpot(object):
 
         if stream_id is None:
             if stream_label is not None:
-                stream_id = self._manager.get_stream_id_by_label(stream_label=stream_label)
+                stream_id = self._manager.get_stream_id_by_label(
+                    stream_label=stream_label
+                )
             else:
                 stream_id = self._manager.get_the_one_active_websocket_api()
             if stream_id is None:
-                logger.critical(f"BinanceWebSocketApiApiSpot.get_aggregate_trades() - error_msg: No `stream_id` "
-                                f"provided or found!")
+                logger.critical(
+                    f"BinanceWebSocketApiApiSpot.get_aggregate_trades() - error_msg: No `stream_id` "
+                    f"provided or found!"
+                )
                 return False
 
         params = {"symbol": symbol.upper()}
 
         if limit is not None:
-            params['limit'] = str(limit)
+            params["limit"] = str(limit)
         if end_time is not None:
-            params['endTime'] = str(end_time)
+            params["endTime"] = str(end_time)
         if from_id is not None:
-            params['fromId'] = str(from_id)
+            params["fromId"] = str(from_id)
         if start_time is not None:
-            params['startTime'] = str(start_time)
+            params["startTime"] = str(start_time)
 
-        request_id = self._manager.get_new_uuid_id() if request_id is None else request_id
+        request_id = (
+            self._manager.get_new_uuid_id() if request_id is None else request_id
+        )
 
-        payload = {"id": request_id,
-                   "method": "trades.aggregate",
-                   "params": params}
+        payload = {"id": request_id, "method": "trades.aggregate", "params": params}
 
-        logger.debug(f"BinanceWebSocketApiApiSpot.get_aggregate_trades() - Created payload: {payload}")
+        logger.debug(
+            f"BinanceWebSocketApiApiSpot.get_aggregate_trades() - Created payload: {payload}"
+        )
 
-        if self._manager.send_with_stream(stream_id=stream_id, payload=payload) is False:
+        if (
+            self._manager.send_with_stream(stream_id=stream_id, payload=payload)
+            is False
+        ):
             self._manager.add_payload_to_stream(stream_id=stream_id, payload=payload)
 
         if process_response is not None:
             with self._manager.process_response_lock:
-                entry = {'callback_function': process_response}
+                entry = {"callback_function": process_response}
                 self._manager.process_response[request_id] = entry
 
         if return_response is True:
             with self._manager.return_response_lock:
-                entry = {'event_return_response': threading.Event()}
+                entry = {"event_return_response": threading.Event()}
                 self._manager.return_response[request_id] = entry
-            self._manager.return_response[request_id]['event_return_response'].wait()
+            self._manager.return_response[request_id]["event_return_response"].wait()
             with self._manager.return_response_lock:
-                response_value = self._manager.return_response[request_id]['response_value']
+                response_value = self._manager.return_response[request_id][
+                    "response_value"
+                ]
                 del self._manager.return_response[request_id]
             return response_value
 
         return True
 
-
-    def get_current_average_price(self, process_response=None, request_id: str = None,
-                                  return_response: bool = False, stream_id: str = None, stream_label: str = None,
-                                  symbol: str = None) -> Union[str, dict, bool]:
+    def get_current_average_price(
+        self,
+        process_response=None,
+        request_id: str = None,
+        return_response: bool = False,
+        stream_id: str = None,
+        stream_label: str = None,
+        symbol: str = None,
+    ) -> Union[str, dict, bool]:
         """
         Current average price
 
@@ -1688,49 +1900,69 @@ class BinanceWebSocketApiApiSpot(object):
         """
         if stream_id is None:
             if stream_label is not None:
-                stream_id = self._manager.get_stream_id_by_label(stream_label=stream_label)
+                stream_id = self._manager.get_stream_id_by_label(
+                    stream_label=stream_label
+                )
             else:
                 stream_id = self._manager.get_the_one_active_websocket_api()
             if stream_id is None:
-                logger.critical(f"BinanceWebSocketApiApiSpot.get_current_average_price() - error_msg: No `stream_id` "
-                                f"provided or found!")
+                logger.critical(
+                    f"BinanceWebSocketApiApiSpot.get_current_average_price() - error_msg: No `stream_id` "
+                    f"provided or found!"
+                )
                 return False
 
         params = {}
         if symbol is not None:
-            params['symbol'] = str(symbol.upper())
+            params["symbol"] = str(symbol.upper())
 
         method = "avgPrice"
-        request_id = self._manager.get_new_uuid_id() if request_id is None else request_id
-        payload = {"id": request_id,
-                   "method": method,
-                   "params": params}
+        request_id = (
+            self._manager.get_new_uuid_id() if request_id is None else request_id
+        )
+        payload = {"id": request_id, "method": method, "params": params}
 
-        logger.debug(f"BinanceWebSocketApiApiSpot.get_current_average_price() - Created payload: {payload}")
+        logger.debug(
+            f"BinanceWebSocketApiApiSpot.get_current_average_price() - Created payload: {payload}"
+        )
 
-        if self._manager.send_with_stream(stream_id=stream_id, payload=payload) is False:
+        if (
+            self._manager.send_with_stream(stream_id=stream_id, payload=payload)
+            is False
+        ):
             self._manager.add_payload_to_stream(stream_id=stream_id, payload=payload)
 
         if process_response is not None:
             with self._manager.process_response_lock:
-                entry = {'callback_function': process_response}
+                entry = {"callback_function": process_response}
                 self._manager.process_response[request_id] = entry
 
         if return_response is True:
             with self._manager.return_response_lock:
-                entry = {'event_return_response': threading.Event()}
+                entry = {"event_return_response": threading.Event()}
                 self._manager.return_response[request_id] = entry
-            self._manager.return_response[request_id]['event_return_response'].wait()
+            self._manager.return_response[request_id]["event_return_response"].wait()
             with self._manager.return_response_lock:
-                response_value = self._manager.return_response[request_id]['response_value']
+                response_value = self._manager.return_response[request_id][
+                    "response_value"
+                ]
                 del self._manager.return_response[request_id]
             return response_value
 
         return True
 
-    def get_exchange_info(self, permissions: list = None, process_response=None, recv_window: int = None,
-                          request_id: str = None, return_response: bool = False, stream_id: str = None,
-                          stream_label: str = None, symbol: str = None, symbols: list = None) -> Union[str, dict, bool]:
+    def get_exchange_info(
+        self,
+        permissions: list = None,
+        process_response=None,
+        recv_window: int = None,
+        request_id: str = None,
+        return_response: bool = False,
+        stream_id: str = None,
+        stream_label: str = None,
+        symbol: str = None,
+        symbols: list = None,
+    ) -> Union[str, dict, bool]:
         """
         Exchange information
 
@@ -1880,12 +2112,16 @@ class BinanceWebSocketApiApiSpot(object):
         """
         if stream_id is None:
             if stream_label is not None:
-                stream_id = self._manager.get_stream_id_by_label(stream_label=stream_label)
+                stream_id = self._manager.get_stream_id_by_label(
+                    stream_label=stream_label
+                )
             else:
                 stream_id = self._manager.get_the_one_active_websocket_api()
             if stream_id is None:
-                logger.critical(f"BinanceWebSocketApiApiSpot.get_exchange_info() - error_msg: No `stream_id` provided"
-                                f" or found!")
+                logger.critical(
+                    f"BinanceWebSocketApiApiSpot.get_exchange_info() - error_msg: No `stream_id` provided"
+                    f" or found!"
+                )
                 return False
         params = {}
         if symbol is not None:
@@ -1896,40 +2132,55 @@ class BinanceWebSocketApiApiSpot(object):
         if permissions is not None:
             params = {"permissions": permissions}
         if recv_window is not None:
-            params['recvWindow'] = str(recv_window)
+            params["recvWindow"] = str(recv_window)
 
         method = "exchangeInfo"
-        request_id = self._manager.get_new_uuid_id() if request_id is None else request_id
+        request_id = (
+            self._manager.get_new_uuid_id() if request_id is None else request_id
+        )
 
-        payload = {"id": request_id,
-                   "method": method,
-                   "params": params}
+        payload = {"id": request_id, "method": method, "params": params}
 
-        logger.debug(f"BinanceWebSocketApiApiSpot.get_exchange_info() - Created payload: {payload}")
+        logger.debug(
+            f"BinanceWebSocketApiApiSpot.get_exchange_info() - Created payload: {payload}"
+        )
 
-        if self._manager.send_with_stream(stream_id=stream_id, payload=payload) is False:
+        if (
+            self._manager.send_with_stream(stream_id=stream_id, payload=payload)
+            is False
+        ):
             self._manager.add_payload_to_stream(stream_id=stream_id, payload=payload)
 
         if process_response is not None:
             with self._manager.process_response_lock:
-                entry = {'callback_function': process_response}
+                entry = {"callback_function": process_response}
                 self._manager.process_response[request_id] = entry
 
         if return_response is True:
             with self._manager.return_response_lock:
-                entry = {'event_return_response': threading.Event()}
+                entry = {"event_return_response": threading.Event()}
                 self._manager.return_response[request_id] = entry
-            self._manager.return_response[request_id]['event_return_response'].wait()
+            self._manager.return_response[request_id]["event_return_response"].wait()
             with self._manager.return_response_lock:
-                response_value = self._manager.return_response[request_id]['response_value']
+                response_value = self._manager.return_response[request_id][
+                    "response_value"
+                ]
                 del self._manager.return_response[request_id]
             return response_value
 
         return True
 
-    def get_historical_trades(self, process_response=None, from_id: int = None, limit: int = None,
-                              request_id: str = None, return_response: bool = False, stream_id: str = None,
-                              stream_label: str = None, symbol: str = None) -> Union[str, dict, bool]:
+    def get_historical_trades(
+        self,
+        process_response=None,
+        from_id: int = None,
+        limit: int = None,
+        request_id: str = None,
+        return_response: bool = False,
+        stream_id: str = None,
+        stream_label: str = None,
+        symbol: str = None,
+    ) -> Union[str, dict, bool]:
         """
         Historical trades
 
@@ -2011,60 +2262,92 @@ class BinanceWebSocketApiApiSpot(object):
 
         if stream_id is None:
             if stream_label is not None:
-                stream_id = self._manager.get_stream_id_by_label(stream_label=stream_label)
+                stream_id = self._manager.get_stream_id_by_label(
+                    stream_label=stream_label
+                )
             else:
                 stream_id = self._manager.get_the_one_active_websocket_api()
             if stream_id is None:
-                logger.critical(f"BinanceWebSocketApiApiSpot.get_historical_trades() - error_msg: No `stream_id` "
-                                f"provided or found!")
+                logger.critical(
+                    f"BinanceWebSocketApiApiSpot.get_historical_trades() - error_msg: No `stream_id` "
+                    f"provided or found!"
+                )
                 return False
 
         params = {"symbol": symbol.upper()}
 
         if limit is not None:
-            params['limit'] = str(limit)
+            params["limit"] = str(limit)
         if from_id is not None:
-            params['fromId'] = str(from_id)
+            params["fromId"] = str(from_id)
 
-        request_id = self._manager.get_new_uuid_id() if request_id is None else request_id
-        payload = {"id": request_id,
-                   "method": "trades.historical",
-                   "params": params}
+        request_id = (
+            self._manager.get_new_uuid_id() if request_id is None else request_id
+        )
+        payload = {"id": request_id, "method": "trades.historical", "params": params}
 
-        logger.debug(f"BinanceWebSocketApiApiSpot.get_historical_trades() - Created payload: {payload}")
+        logger.debug(
+            f"BinanceWebSocketApiApiSpot.get_historical_trades() - Created payload: {payload}"
+        )
 
-        if self._manager.send_with_stream(stream_id=stream_id, payload=payload) is False:
+        if (
+            self._manager.send_with_stream(stream_id=stream_id, payload=payload)
+            is False
+        ):
             self._manager.add_payload_to_stream(stream_id=stream_id, payload=payload)
 
         if process_response is not None:
             with self._manager.process_response_lock:
-                entry = {'callback_function': process_response}
+                entry = {"callback_function": process_response}
                 self._manager.process_response[request_id] = entry
 
         if return_response is True:
             with self._manager.return_response_lock:
-                entry = {'event_return_response': threading.Event()}
+                entry = {"event_return_response": threading.Event()}
                 self._manager.return_response[request_id] = entry
-            self._manager.return_response[request_id]['event_return_response'].wait()
+            self._manager.return_response[request_id]["event_return_response"].wait()
             with self._manager.return_response_lock:
-                response_value = self._manager.return_response[request_id]['response_value']
+                response_value = self._manager.return_response[request_id][
+                    "response_value"
+                ]
                 del self._manager.return_response[request_id]
             return response_value
 
         return True
 
-    def get_klines(self, process_response=None,
-                   end_time: int = None,
-                   interval: Optional[Literal['1s', '1m', '3m', '5m', '15m', '30m', '1h', '2h', '4h', '6h', '8h', '12h',
-                                              '1d', '3d', '1w', '1M']] = None,
-                   limit: int = None,
-                   request_id: str = None,
-                   return_response: bool = False,
-                   start_time: int = None,
-                   stream_id: str = None,
-                   stream_label: str = None,
-                   symbol: str = None,
-                   time_zone: str = None) -> Union[str, dict, bool]:
+    def get_klines(
+        self,
+        process_response=None,
+        end_time: int = None,
+        interval: Optional[
+            Literal[
+                "1s",
+                "1m",
+                "3m",
+                "5m",
+                "15m",
+                "30m",
+                "1h",
+                "2h",
+                "4h",
+                "6h",
+                "8h",
+                "12h",
+                "1d",
+                "3d",
+                "1w",
+                "1M",
+            ]
+        ] = None,
+        limit: int = None,
+        request_id: str = None,
+        return_response: bool = False,
+        start_time: int = None,
+        stream_id: str = None,
+        stream_label: str = None,
+        symbol: str = None,
+        time_zone: str = None,
+    ) -> Union[str, dict, bool]:
         """
         Klines
 
@@ -2174,57 +2457,74 @@ class BinanceWebSocketApiApiSpot(object):
 
         if stream_id is None:
             if stream_label is not None:
-                stream_id = self._manager.get_stream_id_by_label(stream_label=stream_label)
+                stream_id = self._manager.get_stream_id_by_label(
+                    stream_label=stream_label
+                )
             else:
                 stream_id = self._manager.get_the_one_active_websocket_api()
             if stream_id is None:
-                logger.critical(f"BinanceWebSocketApiApiSpot.get_klines() - error_msg: No `stream_id` provided "
-                                f"or found!")
+                logger.critical(
+                    f"BinanceWebSocketApiApiSpot.get_klines() - error_msg: No `stream_id` provided "
+                    f"or found!"
+                )
                 return False
 
         params = {"symbol": symbol.upper()}
 
         if interval is not None:
-            params['interval'] = str(interval)
+            params["interval"] = str(interval)
         if limit is not None:
-            params['limit'] = str(limit)
+            params["limit"] = str(limit)
         if end_time is not None:
-            params['endTime'] = str(end_time)
+            params["endTime"] = str(end_time)
         if start_time is not None:
-            params['startTime'] = str(start_time)
+            params["startTime"] = str(start_time)
         if time_zone is not None:
-            params['timeZone'] = str(time_zone)
+            params["timeZone"] = str(time_zone)
 
-        request_id = self._manager.get_new_uuid_id() if request_id is None else request_id
+        request_id = (
+            self._manager.get_new_uuid_id() if request_id is None else request_id
+        )
 
-        payload = {"id": request_id,
-                   "method": "klines",
-                   "params": params}
+        payload = {"id": request_id, "method": "klines", "params": params}
 
-        logger.debug(f"BinanceWebSocketApiApiSpot.get_klines() - Created payload: {payload}")
+        logger.debug(
+            f"BinanceWebSocketApiApiSpot.get_klines() - Created payload: {payload}"
+        )
 
-        if self._manager.send_with_stream(stream_id=stream_id, payload=payload) is False:
+        if (
+            self._manager.send_with_stream(stream_id=stream_id, payload=payload)
+            is False
+        ):
             self._manager.add_payload_to_stream(stream_id=stream_id, payload=payload)
 
         if process_response is not None:
             with self._manager.process_response_lock:
-                entry = {'callback_function': process_response}
+                entry = {"callback_function": process_response}
                 self._manager.process_response[request_id] = entry
 
         if return_response is True:
             with self._manager.return_response_lock:
-                entry = {'event_return_response': threading.Event()}
+                entry = {"event_return_response": threading.Event()}
                 self._manager.return_response[request_id] = entry
-            self._manager.return_response[request_id]['event_return_response'].wait()
+            self._manager.return_response[request_id]["event_return_response"].wait()
             with self._manager.return_response_lock:
-                response_value = self._manager.return_response[request_id]['response_value']
+                response_value = self._manager.return_response[request_id][
+                    "response_value"
+                ]
                 del self._manager.return_response[request_id]
             return response_value
 
         return True
 
-    def get_listen_key(self, process_response=None, request_id: str = None, return_response: bool = False,
-                       stream_id: str = None, stream_label: str = None) -> Union[str, dict, bool]:
+    def get_listen_key(
+        self,
+        process_response=None,
+        request_id: str = None,
+        return_response: bool = False,
+        stream_id: str = None,
+        stream_label: str = None,
+    ) -> Union[str, dict, bool]:
         """
         Start user data stream (USER_STREAM)
 
@@ -2285,47 +2585,65 @@ class BinanceWebSocketApiApiSpot(object):
         """
         if stream_id is None:
             if stream_label is not None:
-                stream_id = self._manager.get_stream_id_by_label(stream_label=stream_label)
+                stream_id = self._manager.get_stream_id_by_label(
+                    stream_label=stream_label
+                )
             else:
                 stream_id = self._manager.get_the_one_active_websocket_api()
             if stream_id is None:
-                logger.critical(f"BinanceWebSocketApiApiSpot.get_listen_key() - error_msg: No `stream_id` provided or "
-                                f"found!")
+                logger.critical(
+                    f"BinanceWebSocketApiApiSpot.get_listen_key() - error_msg: No `stream_id` provided or "
+                    f"found!"
+                )
                 return False
 
-        request_id = self._manager.get_new_uuid_id() if request_id is None else request_id
+        request_id = (
+            self._manager.get_new_uuid_id() if request_id is None else request_id
+        )
         method = "userDataStream.start"
-        params = {"apiKey": self._manager.stream_list[stream_id]['api_key']}
+        params = {"apiKey": self._manager.stream_list[stream_id]["api_key"]}
 
-        payload = {"id": request_id,
-                   "method": method,
-                   "params": params}
+        payload = {"id": request_id, "method": method, "params": params}
 
-        logger.debug(f"BinanceWebSocketApiApiSpot.get_listen_key() - Created payload: {payload}")
+        logger.debug(
+            f"BinanceWebSocketApiApiSpot.get_listen_key() - Created payload: {payload}"
+        )
 
-        if self._manager.send_with_stream(stream_id=stream_id, payload=payload) is False:
+        if (
+            self._manager.send_with_stream(stream_id=stream_id, payload=payload)
+            is False
+        ):
             self._manager.add_payload_to_stream(stream_id=stream_id, payload=payload)
 
         if process_response is not None:
             with self._manager.process_response_lock:
-                entry = {'callback_function': process_response}
+                entry = {"callback_function": process_response}
                 self._manager.process_response[request_id] = entry
 
         if return_response is True:
             with self._manager.return_response_lock:
-                entry = {'event_return_response': threading.Event()}
+                entry = {"event_return_response": threading.Event()}
                 self._manager.return_response[request_id] = entry
-            self._manager.return_response[request_id]['event_return_response'].wait()
+            self._manager.return_response[request_id]["event_return_response"].wait()
             with self._manager.return_response_lock:
-                response_value = self._manager.return_response[request_id]['response_value']
+                response_value = self._manager.return_response[request_id][
+                    "response_value"
+                ]
                 del self._manager.return_response[request_id]
             return response_value
 
         return True
 
-    def get_open_orders(self, process_response=None, recv_window: int = None, request_id: str = None,
-                        return_response: bool = False, stream_id: str = None, stream_label: str = None,
-                        symbol: str = None) -> Union[str, dict, bool]:
+    def get_open_orders(
+        self,
+        process_response=None,
+        recv_window: int = None,
+        request_id: str = None,
+        return_response: bool = False,
+        stream_id: str = None,
+        stream_label: str = None,
+        symbol: str = None,
+    ) -> Union[str, dict, bool]:
         """
         Current open orders (USER_DATA)
 
@@ -2426,57 +2744,81 @@ class BinanceWebSocketApiApiSpot(object):
         """
         if stream_id is None:
             if stream_label is not None:
-                stream_id = self._manager.get_stream_id_by_label(stream_label=stream_label)
+                stream_id = self._manager.get_stream_id_by_label(
+                    stream_label=stream_label
+                )
             else:
                 stream_id = self._manager.get_the_one_active_websocket_api()
             if stream_id is None:
-                logger.critical(f"BinanceWebSocketApiApiSpot.get_open_orders() - error_msg: No `stream_id` provided or "
-                                f"found!")
+                logger.critical(
+                    f"BinanceWebSocketApiApiSpot.get_open_orders() - error_msg: No `stream_id` provided or "
+                    f"found!"
+                )
                 return False
 
-        params = {"apiKey": self._manager.stream_list[stream_id]['api_key'],
-                  "timestamp": self._manager.get_timestamp()}
+        params = {
+            "apiKey": self._manager.stream_list[stream_id]["api_key"],
+            "timestamp": self._manager.get_timestamp(),
+        }
 
         if symbol is not None:
-            params['symbol'] = str(symbol.upper())
+            params["symbol"] = str(symbol.upper())
 
         if recv_window is not None:
-            params['recvWindow'] = str(recv_window)
+            params["recvWindow"] = str(recv_window)
 
         method = "openOrders.status"
-        api_secret = self._manager.stream_list[stream_id]['api_secret']
-        request_id = self._manager.get_new_uuid_id() if request_id is None else request_id
-        params['signature'] = self._manager.generate_signature(api_secret=api_secret, data=params)
+        api_secret = self._manager.stream_list[stream_id]["api_secret"]
+        request_id = (
+            self._manager.get_new_uuid_id() if request_id is None else request_id
+        )
+        params["signature"] = self._manager.generate_signature(
+            api_secret=api_secret, data=params
+        )
 
-        payload = {"id": request_id,
-                   "method": method,
-                   "params": params}
+        payload = {"id": request_id, "method": method, "params": params}
 
-        logger.debug(f"BinanceWebSocketApiApiSpot.get_open_orders() - Created payload: {payload}")
+        logger.debug(
+            f"BinanceWebSocketApiApiSpot.get_open_orders() - Created payload: {payload}"
+        )
 
-        if self._manager.send_with_stream(stream_id=stream_id, payload=payload) is False:
+        if (
+            self._manager.send_with_stream(stream_id=stream_id, payload=payload)
+            is False
+        ):
             self._manager.add_payload_to_stream(stream_id=stream_id, payload=payload)
 
         if process_response is not None:
             with self._manager.process_response_lock:
-                entry = {'callback_function': process_response}
+                entry = {"callback_function": process_response}
                 self._manager.process_response[request_id] = entry
 
         if return_response is True:
             with self._manager.return_response_lock:
-                entry = {'event_return_response': threading.Event()}
+                entry = {"event_return_response": threading.Event()}
                 self._manager.return_response[request_id] = entry
-            self._manager.return_response[request_id]['event_return_response'].wait()
+            self._manager.return_response[request_id]["event_return_response"].wait()
             with self._manager.return_response_lock:
-                response_value = self._manager.return_response[request_id]['response_value']
+                response_value = self._manager.return_response[request_id][
+                    "response_value"
+                ]
                 del self._manager.return_response[request_id]
             return response_value
 
         return True
 
-    def get_order(self, order_id: int = None, orig_client_order_id: str = None, process_response=None,
-                  recv_window: int = None, request_id: str = None, return_response: bool = False, stream_id: str = None,
-                  stream_label: str = None, symbol: str = None) -> Union[str, dict, bool]:
+    def get_order(
+        self,
+        order_id: int = None,
+        orig_client_order_id: str = None,
+        process_response=None,
+        recv_window: int = None,
+        request_id: str = None,
+        return_response: bool = False,
+        stream_id: str = None,
+        stream_label: str = None,
+        symbol: str = None,
+    ) -> Union[str, dict, bool]:
         """
         Query order (USER_DATA)
 
@@ -2581,63 +2923,88 @@ class BinanceWebSocketApiApiSpot(object):
             }
         """
         if symbol is None or (order_id is None and orig_client_order_id is None):
-            raise ValueError(f"Missing mandatory parameter: symbol, order_id/orig_client_order_id")
+            raise ValueError(
+                f"Missing mandatory parameter: symbol, order_id/orig_client_order_id"
+            )
 
         if stream_id is None:
             if stream_label is not None:
-                stream_id = self._manager.get_stream_id_by_label(stream_label=stream_label)
+                stream_id = self._manager.get_stream_id_by_label(
+                    stream_label=stream_label
+                )
             else:
                 stream_id = self._manager.get_the_one_active_websocket_api()
             if stream_id is None:
-                logger.critical(f"BinanceWebSocketApiApiSpot.get_order() - error_msg: No `stream_id` provided or "
-                                f"found!")
+                logger.critical(
+                    f"BinanceWebSocketApiApiSpot.get_order() - error_msg: No `stream_id` provided or "
+                    f"found!"
+                )
                 return False
 
-        params = {"apiKey": self._manager.stream_list[stream_id]['api_key'],
-                  "symbol": symbol.upper(),
-                  "timestamp": self._manager.get_timestamp()}
+        params = {
+            "apiKey": self._manager.stream_list[stream_id]["api_key"],
+            "symbol": symbol.upper(),
+            "timestamp": self._manager.get_timestamp(),
+        }
 
         if order_id is not None:
-            params['orderId'] = int(order_id)
+            params["orderId"] = int(order_id)
         if orig_client_order_id is not None:
-            params['origClientOrderId'] = str(orig_client_order_id)
+            params["origClientOrderId"] = str(orig_client_order_id)
         if recv_window is not None:
-            params['recvWindow'] = str(recv_window)
+            params["recvWindow"] = str(recv_window)
 
         method = "order.status"
-        api_secret = self._manager.stream_list[stream_id]['api_secret']
-        request_id = self._manager.get_new_uuid_id() if request_id is None else request_id
-        params['signature'] = self._manager.generate_signature(api_secret=api_secret, data=params)
+        api_secret = self._manager.stream_list[stream_id]["api_secret"]
+        request_id = (
+            self._manager.get_new_uuid_id() if request_id is None else request_id
+        )
+        params["signature"] = self._manager.generate_signature(
+            api_secret=api_secret, data=params
+        )
 
-        payload = {"id": request_id,
-                   "method": method,
-                   "params": params}
+        payload = {"id": request_id, "method": method, "params": params}
 
-        logger.debug(f"BinanceWebSocketApiApiSpot.get_order() - Created payload: {payload}")
+        logger.debug(
+            f"BinanceWebSocketApiApiSpot.get_order() - Created payload: {payload}"
+        )
 
-        if self._manager.send_with_stream(stream_id=stream_id, payload=payload) is False:
+        if (
+            self._manager.send_with_stream(stream_id=stream_id, payload=payload)
+            is False
+        ):
             self._manager.add_payload_to_stream(stream_id=stream_id, payload=payload)
 
         if process_response is not None:
             with self._manager.process_response_lock:
-                entry = {'callback_function': process_response}
+                entry = {"callback_function": process_response}
                 self._manager.process_response[request_id] = entry
 
         if return_response is True:
             with self._manager.return_response_lock:
-                entry = {'event_return_response': threading.Event()}
+                entry = {"event_return_response": threading.Event()}
                 self._manager.return_response[request_id] = entry
-            self._manager.return_response[request_id]['event_return_response'].wait()
+            self._manager.return_response[request_id]["event_return_response"].wait()
             with self._manager.return_response_lock:
-                response_value = self._manager.return_response[request_id]['response_value']
+                response_value = self._manager.return_response[request_id][
+                    "response_value"
+                ]
                 del self._manager.return_response[request_id]
             return response_value
 
         return True
 
-    def get_order_book(self, process_response=None, limit: int = None, recv_window: int = None, request_id: str = None,
-                       return_response: bool = False, stream_id: str = None, stream_label: str = None,
-                       symbol: str = None) -> Union[str, dict, bool]:
+    def get_order_book(
+        self,
+        process_response=None,
+        limit: int = None,
+        recv_window: int = None,
+        request_id: str = None,
+        return_response: bool = False,
+        stream_id: str = None,
+        stream_label: str = None,
+        symbol: str = None,
+    ) -> Union[str, dict, bool]:
         """
         Order book
 
@@ -2763,52 +3130,70 @@ class BinanceWebSocketApiApiSpot(object):
 
         if stream_id is None:
             if stream_label is not None:
-                stream_id = self._manager.get_stream_id_by_label(stream_label=stream_label)
+                stream_id = self._manager.get_stream_id_by_label(
+                    stream_label=stream_label
+                )
             else:
                 stream_id = self._manager.get_the_one_active_websocket_api()
             if stream_id is None:
-                logger.critical(f"BinanceWebSocketApiApiSpot.get_order_book() - error_msg: No `stream_id` provided or "
-                                f"found!")
+                logger.critical(
+                    f"BinanceWebSocketApiApiSpot.get_order_book() - error_msg: No `stream_id` provided or "
+                    f"found!"
+                )
                 return False
 
         params = {"symbol": symbol.upper()}
 
         if limit is not None:
-            params['limit'] = str(limit)
+            params["limit"] = str(limit)
         if recv_window is not None:
-            params['recvWindow'] = str(recv_window)
+            params["recvWindow"] = str(recv_window)
 
-        request_id = self._manager.get_new_uuid_id() if request_id is None else request_id
+        request_id = (
+            self._manager.get_new_uuid_id() if request_id is None else request_id
+        )
 
-        payload = {"id": request_id,
-                   "method": "depth",
-                   "params": params}
+        payload = {"id": request_id, "method": "depth", "params": params}
 
-        logger.debug(f"BinanceWebSocketApiApiSpot.get_order_book() - Created payload: {payload}")
+        logger.debug(
+            f"BinanceWebSocketApiApiSpot.get_order_book() - Created payload: {payload}"
+        )
 
-        if self._manager.send_with_stream(stream_id=stream_id, payload=payload) is False:
+        if (
+            self._manager.send_with_stream(stream_id=stream_id, payload=payload)
+            is False
+        ):
             self._manager.add_payload_to_stream(stream_id=stream_id, payload=payload)
 
         if process_response is not None:
             with self._manager.process_response_lock:
-                entry = {'callback_function': process_response}
+                entry = {"callback_function": process_response}
                 self._manager.process_response[request_id] = entry
 
         if return_response is True:
             with self._manager.return_response_lock:
-                entry = {'event_return_response': threading.Event()}
+                entry = {"event_return_response": threading.Event()}
                 self._manager.return_response[request_id] = entry
-            self._manager.return_response[request_id]['event_return_response'].wait()
+            self._manager.return_response[request_id]["event_return_response"].wait()
             with self._manager.return_response_lock:
-                response_value = self._manager.return_response[request_id]['response_value']
+                response_value = self._manager.return_response[request_id][
+                    "response_value"
+                ]
                 del self._manager.return_response[request_id]
             return response_value
 
         return True
 
-    def get_recent_trades(self, process_response=None, limit: int = None,
-                          request_id: str = None, return_response: bool = False, stream_id: str = None,
-                          stream_label: str = None, symbol: str = None) -> Union[str, dict, bool]:
+    def get_recent_trades(
+        self,
+        process_response=None,
+        limit: int = None,
+        request_id: str = None,
+        return_response: bool = False,
+        stream_id: str = None,
+        stream_label: str = None,
+        symbol: str = None,
+    ) -> Union[str, dict, bool]:
         """
         Recent trades
 
@@ -2890,49 +3275,66 @@ class BinanceWebSocketApiApiSpot(object):
 
         if stream_id is None:
             if stream_label is not None:
-                stream_id = self._manager.get_stream_id_by_label(stream_label=stream_label)
+                stream_id = self._manager.get_stream_id_by_label(
+                    stream_label=stream_label
+                )
             else:
                 stream_id = self._manager.get_the_one_active_websocket_api()
             if stream_id is None:
-                logger.critical(f"BinanceWebSocketApiApiSpot.get_recent_trades() - error_msg: No `stream_id` provided "
-                                f"or found!")
+                logger.critical(
+                    f"BinanceWebSocketApiApiSpot.get_recent_trades() - error_msg: No `stream_id` provided "
+                    f"or found!"
+                )
                 return False
 
         params = {"symbol": symbol.upper()}
 
         if limit is not None:
-            params['limit'] = str(limit)
+            params["limit"] = str(limit)
 
-        request_id = self._manager.get_new_uuid_id() if request_id is None else request_id
+        request_id = (
+            self._manager.get_new_uuid_id() if request_id is None else request_id
+        )
 
-        payload = {"id": request_id,
-                   "method": "trades.recent",
-                   "params": params}
+        payload = {"id": request_id, "method": "trades.recent", "params": params}
 
-        logger.debug(f"BinanceWebSocketApiApiSpot.get_recent_trades() - Created payload: {payload}")
+        logger.debug(
+            f"BinanceWebSocketApiApiSpot.get_recent_trades() - Created payload: {payload}"
+        )
 
-        if self._manager.send_with_stream(stream_id=stream_id, payload=payload) is False:
+        if (
+            self._manager.send_with_stream(stream_id=stream_id, payload=payload)
+            is False
+        ):
             self._manager.add_payload_to_stream(stream_id=stream_id, payload=payload)
 
         if process_response is not None:
             with self._manager.process_response_lock:
-                entry = {'callback_function': process_response}
+                entry = {"callback_function": process_response}
                 self._manager.process_response[request_id] = entry
 
         if return_response is True:
             with self._manager.return_response_lock:
-                entry = {'event_return_response': threading.Event()}
+                entry = {"event_return_response": threading.Event()}
                 self._manager.return_response[request_id] = entry
-            self._manager.return_response[request_id]['event_return_response'].wait()
+            self._manager.return_response[request_id]["event_return_response"].wait()
             with self._manager.return_response_lock:
-                response_value = self._manager.return_response[request_id]['response_value']
+                response_value = self._manager.return_response[request_id][
+                    "response_value"
+                ]
                 del self._manager.return_response[request_id]
             return response_value
 
         return True
 
-    def get_server_time(self, process_response=None, request_id: str = None, return_response: bool = False,
-                        stream_id: str = None, stream_label: str = None) -> Union[str, dict, bool]:
+    def get_server_time(
+        self,
+        process_response=None,
+        request_id: str = None,
+        return_response: bool = False,
+        stream_id: str = None,
+        stream_label: str = None,
+    ) -> Union[str, dict, bool]:
         """
         Check server time
 
@@ -2989,43 +3391,61 @@ class BinanceWebSocketApiApiSpot(object):
         """
         if stream_id is None:
             if stream_label is not None:
-                stream_id = self._manager.get_stream_id_by_label(stream_label=stream_label)
+                stream_id = self._manager.get_stream_id_by_label(
+                    stream_label=stream_label
+                )
             else:
                 stream_id = self._manager.get_the_one_active_websocket_api()
             if stream_id is None:
-                logger.critical(f"BinanceWebSocketApiApiSpot.get_server_time() - error_msg: No `stream_id` provided or "
-                                f"found!")
+                logger.critical(
+                    f"BinanceWebSocketApiApiSpot.get_server_time() - error_msg: No `stream_id` provided or "
+                    f"found!"
+                )
                 return False
 
-        request_id = self._manager.get_new_uuid_id() if request_id is None else request_id
+        request_id = (
+            self._manager.get_new_uuid_id() if request_id is None else request_id
+        )
 
-        payload = {"id": request_id,
-                   "method": "time"}
+        payload = {"id": request_id, "method": "time"}
 
-        logger.debug(f"BinanceWebSocketApiApiSpot.get_server_time() - Created payload: {payload}")
+        logger.debug(
+            f"BinanceWebSocketApiApiSpot.get_server_time() - Created payload: {payload}"
+        )
 
-        if self._manager.send_with_stream(stream_id=stream_id, payload=payload) is False:
+        if (
+            self._manager.send_with_stream(stream_id=stream_id, payload=payload)
+            is False
+        ):
             self._manager.add_payload_to_stream(stream_id=stream_id, payload=payload)
 
         if process_response is not None:
             with self._manager.process_response_lock:
-                entry = {'callback_function': process_response}
+                entry = {"callback_function": process_response}
                 self._manager.process_response[request_id] = entry
 
         if return_response is True:
             with self._manager.return_response_lock:
-                entry = {'event_return_response': threading.Event()}
+                entry = {"event_return_response": threading.Event()}
                 self._manager.return_response[request_id] = entry
-            self._manager.return_response[request_id]['event_return_response'].wait()
+            self._manager.return_response[request_id]["event_return_response"].wait()
             with self._manager.return_response_lock:
-                response_value = self._manager.return_response[request_id]['response_value']
+                response_value = self._manager.return_response[request_id][
+                    "response_value"
+                ]
                 del self._manager.return_response[request_id]
             return response_value
 
         return True
 
-    def ping(self, process_response=None, request_id: str = None, return_response: bool = False,
-             stream_id: str = None, stream_label: str = None) -> Union[str, dict, bool]:
+    def ping(
+        self,
+        process_response=None,
+        request_id: str = None,
+        return_response: bool = False,
+        stream_id: str = None,
+        stream_label: str = None,
+    ) -> Union[str, dict, bool]:
         """
         Test connectivity
 
@@ -3079,54 +3499,84 @@ class BinanceWebSocketApiApiSpot(object):
         """
         if stream_id is None:
             if stream_label is not None:
-                stream_id = self._manager.get_stream_id_by_label(stream_label=stream_label)
+                stream_id = self._manager.get_stream_id_by_label(
+                    stream_label=stream_label
+                )
             else:
                 stream_id = self._manager.get_the_one_active_websocket_api()
             if stream_id is None:
-                logger.critical(f"BinanceWebSocketApiApiSpot.ping() - error_msg: No `stream_id` provided or "
-                                f"found!")
+                logger.critical(
+                    f"BinanceWebSocketApiApiSpot.ping() - error_msg: No `stream_id` provided or "
+                    f"found!"
+                )
                 return False
 
-        request_id = self._manager.get_new_uuid_id() if request_id is None else request_id
+        request_id = (
+            self._manager.get_new_uuid_id() if request_id is None else request_id
+        )
 
-        payload = {"id": request_id,
-                   "method": "ping"}
+        payload = {"id": request_id, "method": "ping"}
 
         logger.debug(f"BinanceWebSocketApiApiSpot.ping() - Created payload: {payload}")
 
-        if self._manager.send_with_stream(stream_id=stream_id, payload=payload) is False:
+        if (
+            self._manager.send_with_stream(stream_id=stream_id, payload=payload)
+            is False
+        ):
             self._manager.add_payload_to_stream(stream_id=stream_id, payload=payload)
 
         if process_response is not None:
             with self._manager.process_response_lock:
-                entry = {'callback_function': process_response}
+                entry = {"callback_function": process_response}
                 self._manager.process_response[request_id] = entry
 
         if return_response is True:
             with self._manager.return_response_lock:
-                entry = {'event_return_response': threading.Event()}
+                entry = {"event_return_response": threading.Event()}
                 self._manager.return_response[request_id] = entry
-            self._manager.return_response[request_id]['event_return_response'].wait()
+            self._manager.return_response[request_id]["event_return_response"].wait()
             with self._manager.return_response_lock:
-                response_value = self._manager.return_response[request_id]['response_value']
+                response_value = self._manager.return_response[request_id][
+                    "response_value"
+                ]
                 del self._manager.return_response[request_id]
             return response_value
 
         return True
 
-    def get_ui_klines(self,
-                      process_response=None,
-                      end_time: int = None,
-                      interval: Optional[Literal['1s', '1m', '3m', '5m', '15m', '30m', '1h', '2h', '4h', '6h', '8h',
-                                                 '12h', '1d', '3d', '1w', '1M']] = None,
-                      limit: int = None,
-                      request_id: str = None,
-                      return_response: bool = False,
-                      start_time: int = None,
-                      stream_id: str = None,
-                      stream_label: str = None,
-                      symbol: str = None,
-                      time_zone: str = None) -> Union[str, dict, bool]:
+    def get_ui_klines(
+        self,
+        process_response=None,
+        end_time: int = None,
+        interval: Optional[
+            Literal[
+                "1s",
+                "1m",
+                "3m",
+                "5m",
+                "15m",
+                "30m",
+                "1h",
+                "2h",
+                "4h",
+                "6h",
+                "8h",
+                "12h",
+                "1d",
+                "3d",
+                "1w",
+                "1M",
+            ]
+        ] = None,
+        limit: int = None,
+        request_id: str = None,
+        return_response: bool = False,
+        start_time: int = None,
+        stream_id: str = None,
+        stream_label: str = None,
+        symbol: str = None,
+        time_zone: str = None,
+    ) -> Union[str, dict, bool]:
         """
         UI Klines
 
@@ -3228,57 +3678,74 @@ class BinanceWebSocketApiApiSpot(object):
 
         if stream_id is None:
             if stream_label is not None:
-                stream_id = self._manager.get_stream_id_by_label(stream_label=stream_label)
+                stream_id = self._manager.get_stream_id_by_label(
+                    stream_label=stream_label
+                )
             else:
                 stream_id = self._manager.get_the_one_active_websocket_api()
             if stream_id is None:
-                logger.critical(f"BinanceWebSocketApiApiSpot.get_ui_klines() - error_msg: No `stream_id` provided "
-                                f"or found!")
+                logger.critical(
+                    f"BinanceWebSocketApiApiSpot.get_ui_klines() - error_msg: No `stream_id` provided "
+                    f"or found!"
+                )
                 return False
 
         params = {"symbol": symbol.upper()}
 
         if interval is not None:
-            params['interval'] = str(interval)
+            params["interval"] = str(interval)
         if limit is not None:
-            params['limit'] = str(limit)
+            params["limit"] = str(limit)
         if end_time is not None:
-            params['endTime'] = str(end_time)
+            params["endTime"] = str(end_time)
         if start_time is not None:
-            params['startTime'] = str(start_time)
+            params["startTime"] = str(start_time)
         if time_zone is not None:
-            params['timeZone'] = str(time_zone)
+            params["timeZone"] = str(time_zone)
 
-        request_id = self._manager.get_new_uuid_id() if request_id is None else request_id
+        request_id = (
+            self._manager.get_new_uuid_id() if request_id is None else request_id
+        )
 
-        payload = {"id": request_id,
-                   "method": "uiKlines",
-                   "params": params}
+        payload = {"id": request_id, "method": "uiKlines", "params": params}
 
-        logger.debug(f"BinanceWebSocketApiApiSpot.get_ui_klines() - Created payload: {payload}")
+        logger.debug(
+            f"BinanceWebSocketApiApiSpot.get_ui_klines() - Created payload: {payload}"
+        )
 
-        if self._manager.send_with_stream(stream_id=stream_id, payload=payload) is False:
+        if (
+            self._manager.send_with_stream(stream_id=stream_id, payload=payload)
+            is False
+        ):
             self._manager.add_payload_to_stream(stream_id=stream_id, payload=payload)
 
         if process_response is not None:
             with self._manager.process_response_lock:
-                entry = {'callback_function': process_response}
+                entry = {"callback_function": process_response}
                 self._manager.process_response[request_id] = entry
 
         if return_response is True:
             with self._manager.return_response_lock:
-                entry = {'event_return_response': threading.Event()}
+                entry = {"event_return_response": threading.Event()}
                 self._manager.return_response[request_id] = entry
-            self._manager.return_response[request_id]['event_return_response'].wait()
+            self._manager.return_response[request_id]["event_return_response"].wait()
             with self._manager.return_response_lock:
-                response_value = self._manager.return_response[request_id]['response_value']
+                response_value = self._manager.return_response[request_id][
+                    "response_value"
+                ]
                 del self._manager.return_response[request_id]
             return response_value
 
         return True
 
-    def get_unfilled_order_count(self, process_response=None, request_id: str = None, return_response: bool = False,
-                                 stream_id: str = None, stream_label: str = None) -> Union[str, dict, bool]:
+    def get_unfilled_order_count(
+        self,
+        process_response=None,
+        request_id: str = None,
+        return_response: bool = False,
+        stream_id: str = None,
+        stream_label: str = None,
+    ) -> Union[str, dict, bool]:
         """
         Unfilled Order Count (USER_DATA)
 
@@ -3356,41 +3823,54 @@ class BinanceWebSocketApiApiSpot(object):
         """
         if stream_id is None:
             if stream_label is not None:
-                stream_id = self._manager.get_stream_id_by_label(stream_label=stream_label)
+                stream_id = self._manager.get_stream_id_by_label(
+                    stream_label=stream_label
+                )
             else:
                 stream_id = self._manager.get_the_one_active_websocket_api()
             if stream_id is None:
-                logger.critical(f"BinanceWebSocketApiApiSpot.get_unfilled_order_count() - error_msg: No `stream_id` "
-                                f"provided or found!")
+                logger.critical(
+                    f"BinanceWebSocketApiApiSpot.get_unfilled_order_count() - error_msg: No `stream_id` "
+                    f"provided or found!"
+                )
                 return False
 
-        params = {"apiKey": self._manager.stream_list[stream_id]['api_key']}
+        params = {"apiKey": self._manager.stream_list[stream_id]["api_key"]}
         method = "account.rateLimits.orders"
-        api_secret = self._manager.stream_list[stream_id]['api_secret']
-        request_id = self._manager.get_new_uuid_id() if request_id is None else request_id
-        params['signature'] = self._manager.generate_signature(api_secret=api_secret, data=params)
+        api_secret = self._manager.stream_list[stream_id]["api_secret"]
+        request_id = (
+            self._manager.get_new_uuid_id() if request_id is None else request_id
+        )
+        params["signature"] = self._manager.generate_signature(
+            api_secret=api_secret, data=params
+        )
 
-        payload = {"id": request_id,
-                   "method": method,
-                   "params": params}
+        payload = {"id": request_id, "method": method, "params": params}
 
-        logger.debug(f"BinanceWebSocketApiApiSpot.get_unfilled_order_count() - Created payload: {payload}")
+        logger.debug(
+            f"BinanceWebSocketApiApiSpot.get_unfilled_order_count() - Created payload: {payload}"
+        )
 
-        if self._manager.send_with_stream(stream_id=stream_id, payload=payload) is False:
+        if (
+            self._manager.send_with_stream(stream_id=stream_id, payload=payload)
+            is False
+        ):
             self._manager.add_payload_to_stream(stream_id=stream_id, payload=payload)
 
         if process_response is not None:
             with self._manager.process_response_lock:
-                entry = {'callback_function': process_response}
+                entry = {"callback_function": process_response}
                 self._manager.process_response[request_id] = entry
 
         if return_response is True:
             with self._manager.return_response_lock:
-                entry = {'event_return_response': threading.Event()}
+                entry = {"event_return_response": threading.Event()}
                 self._manager.return_response[request_id] = entry
-            self._manager.return_response[request_id]['event_return_response'].wait()
+            self._manager.return_response[request_id]["event_return_response"].wait()
             with self._manager.return_response_lock:
-                response_value = self._manager.return_response[request_id]['response_value']
+                response_value = self._manager.return_response[request_id][
+                    "response_value"
+                ]
                 del self._manager.return_response[request_id]
             return response_value
 

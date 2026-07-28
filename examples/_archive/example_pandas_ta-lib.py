@@ -51,17 +51,21 @@ data_list = []
 min_items = 11
 
 logging.getLogger("unicorn_binance_websocket_api")
-logging.basicConfig(level=logging.DEBUG,
-                    filename=os.path.basename(__file__) + '.log',
-                    format="{asctime} [{levelname:8}] {process} {thread} {module}: {message}",
-                    style="{")
+logging.basicConfig(
+    level=logging.DEBUG,
+    filename=os.path.basename(__file__) + ".log",
+    format="{asctime} [{levelname:8}] {process} {thread} {module}: {message}",
+    style="{",
+)
 
 ubwa = BinanceWebSocketApiManager(exchange="binance.com", output_default="UnicornFy")
-ubwa.create_stream('kline_1m', 'btcusdt')
+ubwa.create_stream("kline_1m", "btcusdt")
 
-print(f"For our calculations we need the klines_1m of the last 10 minutes. Normally we would download the history\r\n"
-      f"via REST API. In this demo, we wait 10 minutes for the websocket connection to receive 10 klines and then\r\n"
-      f"output the entire dataframe to the console every minute from then on.")
+print(
+    f"For our calculations we need the klines_1m of the last 10 minutes. Normally we would download the history\r\n"
+    f"via REST API. In this demo, we wait 10 minutes for the websocket connection to receive 10 klines and then\r\n"
+    f"output the entire dataframe to the console every minute from then on."
+)
 print(f"Learn about pandas-ta: https://twopirllc.github.io/pandas-ta")
 
 while True:
@@ -72,26 +76,37 @@ while True:
     else:
         try:
             # Use only the closing kline
-            if data['kline']['is_closed']:
-                data_list.append([int(data['event_time']/1000),
-                                  data['kline']['open_price'],
-                                  data['kline']['high_price'],
-                                  data['kline']['low_price'],
-                                  data['kline']['close_price'],
-                                  data['kline']['base_volume']])
+            if data["kline"]["is_closed"]:
+                data_list.append(
+                    [
+                        int(data["event_time"] / 1000),
+                        data["kline"]["open_price"],
+                        data["kline"]["high_price"],
+                        data["kline"]["low_price"],
+                        data["kline"]["close_price"],
+                        data["kline"]["base_volume"],
+                    ]
+                )
                 if len(data_list) < min_items:
-                    print(f"Please wait, we need {min_items - len(data_list)} more klines!")
+                    print(
+                        f"Please wait, we need {min_items - len(data_list)} more klines!"
+                    )
                 else:
                     # We create a completely new dataframe with each loop. There is also the possibility to work with
                     # `pd.concat()` or `df.append()`:
                     # https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.append.html
-                    df = pd.DataFrame(data_list, columns=['time', 'open', 'high', 'low', 'close', 'volume'])
+                    df = pd.DataFrame(
+                        data_list,
+                        columns=["time", "open", "high", "low", "close", "volume"],
+                    )
                     # Now we extend the array with new columns, add the date and the values of the RSI and SMA
                     df["date"] = pd.to_datetime(df["time"], unit="s")
                     df["rsi"] = ta.rsi(close=df.close, length=10)
                     df["sma10"] = ta.sma(df.close, length=10)
-                    print(f"Extended dataframe with RSI ({df['rsi'].iloc[-1]}) and SMA10 ({df['sma10'].iloc[-1]}) for "
-                          f"symbol '{data['symbol']}':\r\n{df}\r\n")
+                    print(
+                        f"Extended dataframe with RSI ({df['rsi'].iloc[-1]}) and SMA10 ({df['sma10'].iloc[-1]}) for "
+                        f"symbol '{data['symbol']}':\r\n{df}\r\n"
+                    )
         except TypeError as error_msg:
             print("TypeError: " + str(error_msg))
         except KeyError as error_msg:

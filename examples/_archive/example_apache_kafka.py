@@ -48,17 +48,21 @@ import os
 import time
 
 
-async def import_last_price_to_kafka(kafka_config: dict = None,
-                                     ubwa_manager: BinanceWebSocketApiManager = False,
-                                     markets: list = None):
+async def import_last_price_to_kafka(
+    kafka_config: dict = None,
+    ubwa_manager: BinanceWebSocketApiManager = False,
+    markets: list = None,
+):
 
-    kafka_producer = AIOKafkaProducer(bootstrap_servers=kafka_config['server'],
-                                      security_protocol='SASL_SSL',
-                                      sasl_mechanism='SCRAM-SHA-512',
-                                      sasl_plain_username=kafka_config['user'],
-                                      sasl_plain_password=kafka_config['pass'],
-                                      ssl_context=create_ssl_context(),
-                                      value_serializer=lambda x: json.dumps(x).encode("utf-8"))
+    kafka_producer = AIOKafkaProducer(
+        bootstrap_servers=kafka_config["server"],
+        security_protocol="SASL_SSL",
+        sasl_mechanism="SCRAM-SHA-512",
+        sasl_plain_username=kafka_config["user"],
+        sasl_plain_password=kafka_config["pass"],
+        ssl_context=create_ssl_context(),
+        value_serializer=lambda x: json.dumps(x).encode("utf-8"),
+    )
     await kafka_producer.start()
 
     ubwa_manager.create_stream(channels="trade", markets=markets, output="UnicornFy")
@@ -68,15 +72,15 @@ async def import_last_price_to_kafka(kafka_config: dict = None,
             data = ubwa_manager.pop_stream_data_from_stream_buffer()
             if data is not False:
                 try:
-                    event_type = data['event_type']
-                    symbol = data['symbol']
-                    trade_time = data['trade_time']
-                    price = data['price']
+                    event_type = data["event_type"]
+                    symbol = data["symbol"]
+                    trade_time = data["trade_time"]
+                    price = data["price"]
                 except KeyError:
                     continue
                 if event_type == "trade":
                     topic = f"{kafka_config['user']}-{str(symbol).lower()}_binance_spot_last_trade_price"
-                    message = {'symbol': symbol, 'time': trade_time, 'price': price}
+                    message = {"symbol": symbol, "time": trade_time, "price": price}
                     print(topic, message)
                     await kafka_producer.send_and_wait(topic, message)
             else:
@@ -85,24 +89,33 @@ async def import_last_price_to_kafka(kafka_config: dict = None,
         await kafka_producer.stop()
         ubwa_manager.stop_manager_with_all_streams()
 
+
 if __name__ == "__main__":
     # Logging
-    logging.basicConfig(level=logging.DEBUG,
-                        filename=os.path.basename(__file__) + '.log',
-                        format="{asctime} [{levelname:8}] {process} {thread} {module}: {message}",
-                        style="{")
+    logging.basicConfig(
+        level=logging.DEBUG,
+        filename=os.path.basename(__file__) + ".log",
+        format="{asctime} [{levelname:8}] {process} {thread} {module}: {message}",
+        style="{",
+    )
 
     # Config
-    exchange = 'binance.com'
-    symbols = ['ethusdt', 'btcusdt', 'ltcusdt']
-    kafka = {"server": "rocket.srvs.cloudkafka.com:9094",
-             "user": "pfyrfgiv",
-             "pass": "JUTrtwrJFYdMsYbEZGoL0Zt5m1WElPzS"}
+    exchange = "binance.com"
+    symbols = ["ethusdt", "btcusdt", "ltcusdt"]
+    kafka = {
+        "server": "rocket.srvs.cloudkafka.com:9094",
+        "user": "pfyrfgiv",
+        "pass": "JUTrtwrJFYdMsYbEZGoL0Zt5m1WElPzS",
+    }
 
     ubwa = BinanceWebSocketApiManager(exchange=exchange)
 
     try:
-        asyncio.run(import_last_price_to_kafka(kafka_config=kafka, ubwa_manager=ubwa, markets=symbols))
+        asyncio.run(
+            import_last_price_to_kafka(
+                kafka_config=kafka, ubwa_manager=ubwa, markets=symbols
+            )
+        )
     except KeyboardInterrupt:
         print("\r\nGracefully stopping ...")
     except KafkaConnectionError as error_msg:

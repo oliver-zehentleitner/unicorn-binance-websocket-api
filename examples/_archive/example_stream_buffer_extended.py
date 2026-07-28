@@ -38,28 +38,129 @@ import threading
 import os
 
 logging.getLogger("unicorn_binance_websocket_api")
-logging.basicConfig(level=logging.DEBUG,
-                    filename=os.path.basename(__file__) + '.log',
-                    format="{asctime} [{levelname:8}] {process} {thread} {module}: {message}",
-                    style="{")
+logging.basicConfig(
+    level=logging.DEBUG,
+    filename=os.path.basename(__file__) + ".log",
+    format="{asctime} [{levelname:8}] {process} {thread} {module}: {message}",
+    style="{",
+)
 
 # create instance of BinanceWebSocketApiManager
 ubwa = BinanceWebSocketApiManager()
 
 
-markets = ['xrpbearbusd', 'zeceth', 'cndbtc', 'dashbtc', 'atompax', 'perlbtc', 'ardreth', 'zecbnb', 'bchabctusd',
-           'usdsbusdt', 'winbnb', 'xzcxrp', 'bchusdc', 'wavesbnb', 'kavausdt', 'btsusdt', 'chzbnb', 'tusdbnb',
-           'xtzbusd', 'bcptusdc', 'dogebnb', 'eosbearusdt', 'ambbnb', 'wrxbnb', 'poabtc', 'wanbtc', 'ardrbtc', 'icnbtc',
-           'tusdusdt', 'atombusd', 'nxseth', 'bnbusdt', 'trxxrp', 'erdpax', 'erdbtc', 'icxbusd', 'nulsbtc', 'hotusdt',
-           'wavespax', 'zilbnb', 'arnbtc', 'nulsusdt', 'wintrx', 'npxsbtc', 'busdtry', 'qtumbnb', 'eosbtc', 'xlmpax',
-           'tomobnb', 'eosbnb', 'engbtc', 'linketh', 'xrpbtc', 'fetbtc', 'stratusdt', 'navbnb', 'bcneth', 'yoyobtc',
-           'nanobnb', 'saltbtc', 'tfuelusdc', 'skybnb', 'fuelbtc', 'bnbusdc', 'inseth', 'btcpax', 'batbtc', 'rlceth',
-           'arketh', 'ltcpax', 'ltcbusd', 'duskbtc', 'mftusdt', 'bntusdt', 'mdabtc', 'enjbtc', 'poabnb', 'nanobusd',
-           'paxtusd', 'hotbtc', 'bcdbtc', 'beambnb', 'trxeth', 'omgbnb', 'cdtbtc', 'eosusdc', 'dashbusd', 'cocosbtc',
-           'dasheth', 'xrptusd', 'atomtusd', 'rcneth', 'rpxeth', 'xlmusdc', 'aionbusd', 'nxsbtc', 'chateth', 'repbtc',
-           'tctusdt', 'linkusdt', 'nasbtc', 'usdsusdc', 'xvgbtc', 'elfeth', 'ctxcbtc', 'cmteth', 'gnteth', 'usdspax']
+markets = [
+    "xrpbearbusd",
+    "zeceth",
+    "cndbtc",
+    "dashbtc",
+    "atompax",
+    "perlbtc",
+    "ardreth",
+    "zecbnb",
+    "bchabctusd",
+    "usdsbusdt",
+    "winbnb",
+    "xzcxrp",
+    "bchusdc",
+    "wavesbnb",
+    "kavausdt",
+    "btsusdt",
+    "chzbnb",
+    "tusdbnb",
+    "xtzbusd",
+    "bcptusdc",
+    "dogebnb",
+    "eosbearusdt",
+    "ambbnb",
+    "wrxbnb",
+    "poabtc",
+    "wanbtc",
+    "ardrbtc",
+    "icnbtc",
+    "tusdusdt",
+    "atombusd",
+    "nxseth",
+    "bnbusdt",
+    "trxxrp",
+    "erdpax",
+    "erdbtc",
+    "icxbusd",
+    "nulsbtc",
+    "hotusdt",
+    "wavespax",
+    "zilbnb",
+    "arnbtc",
+    "nulsusdt",
+    "wintrx",
+    "npxsbtc",
+    "busdtry",
+    "qtumbnb",
+    "eosbtc",
+    "xlmpax",
+    "tomobnb",
+    "eosbnb",
+    "engbtc",
+    "linketh",
+    "xrpbtc",
+    "fetbtc",
+    "stratusdt",
+    "navbnb",
+    "bcneth",
+    "yoyobtc",
+    "nanobnb",
+    "saltbtc",
+    "tfuelusdc",
+    "skybnb",
+    "fuelbtc",
+    "bnbusdc",
+    "inseth",
+    "btcpax",
+    "batbtc",
+    "rlceth",
+    "arketh",
+    "ltcpax",
+    "ltcbusd",
+    "duskbtc",
+    "mftusdt",
+    "bntusdt",
+    "mdabtc",
+    "enjbtc",
+    "poabnb",
+    "nanobusd",
+    "paxtusd",
+    "hotbtc",
+    "bcdbtc",
+    "beambnb",
+    "trxeth",
+    "omgbnb",
+    "cdtbtc",
+    "eosusdc",
+    "dashbusd",
+    "cocosbtc",
+    "dasheth",
+    "xrptusd",
+    "atomtusd",
+    "rcneth",
+    "rpxeth",
+    "xlmusdc",
+    "aionbusd",
+    "nxsbtc",
+    "chateth",
+    "repbtc",
+    "tctusdt",
+    "linkusdt",
+    "nasbtc",
+    "usdsusdc",
+    "xvgbtc",
+    "elfeth",
+    "ctxcbtc",
+    "cmteth",
+    "gnteth",
+    "usdspax",
+]
 
-channels = ['kline_1m', 'trade', 'depth20']
+channels = ["kline_1m", "trade", "depth20"]
 
 for channel in channels:
     ubwa.create_stream(channel, markets, stream_buffer_name=channel)
@@ -71,7 +172,9 @@ def print_stream_data_from_stream_buffer(ubwa):
     while True:
         if ubwa.is_manager_stopping():
             exit(0)
-        oldest_stream_data_from_stream_buffer = ubwa.pop_stream_data_from_stream_buffer("kline_1m")
+        oldest_stream_data_from_stream_buffer = ubwa.pop_stream_data_from_stream_buffer(
+            "kline_1m"
+        )
         if oldest_stream_data_from_stream_buffer is None:
             time.sleep(0.01)
         else:
@@ -83,6 +186,7 @@ def print_stream_data_from_stream_buffer(ubwa):
 
 
 # start a worker to process the received stream_data from the stream_buffer to a print function
-worker_thread = threading.Thread(target=print_stream_data_from_stream_buffer, args=(ubwa,))
+worker_thread = threading.Thread(
+    target=print_stream_data_from_stream_buffer, args=(ubwa,)
+)
 worker_thread.start()
-

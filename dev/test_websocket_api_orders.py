@@ -44,17 +44,33 @@ async def binance_stream(ubwa):
     def handle_socket_message(data):
         print(f"received data:\r\n{data}\r\n")
 
-    api_stream = ubwa.create_stream(api=True, api_key=api_key, api_secret=api_secret,
-                                    process_stream_data=handle_socket_message)
+    api_stream = ubwa.create_stream(
+        api=True,
+        api_key=api_key,
+        api_secret=api_secret,
+        process_stream_data=handle_socket_message,
+    )
 
     # LIMIT ORDER
-    ubwa.api.create_order(stream_id=api_stream, price=2888.48, order_type="LIMIT",
-                          quantity=0.0048, side="SELL", symbol=symbol)
+    ubwa.api.create_order(
+        stream_id=api_stream,
+        price=2888.48,
+        order_type="LIMIT",
+        quantity=0.0048,
+        side="SELL",
+        symbol=symbol,
+    )
 
     # LIMIT_MAKER ORDER
 
     # MARKET ORDER
-    ubwa.api.create_order(stream_id=api_stream, order_type="MARKET", quantity=0.0048, side="SELL", symbol=symbol)
+    ubwa.api.create_order(
+        stream_id=api_stream,
+        order_type="MARKET",
+        quantity=0.0048,
+        side="SELL",
+        symbol=symbol,
+    )
 
     # STOP_LOSS ORDER
 
@@ -68,13 +84,16 @@ async def binance_stream(ubwa):
     print(f"Stopping!")
     ubwa.stop_manager()
 
+
 if __name__ == "__main__":
     logging.getLogger("unicorn_binance_websocket_api")
-    logging.basicConfig(level=logging.DEBUG,
-                        filename=os.path.basename(__file__) + '.log',
-                        format="{asctime} [{levelname:8}] {process} {thread} {module}: {message}",
-                        style="{")
-    ubwa = BinanceWebSocketApiManager(exchange='binance.com')
+    logging.basicConfig(
+        level=logging.DEBUG,
+        filename=os.path.basename(__file__) + ".log",
+        format="{asctime} [{levelname:8}] {process} {thread} {module}: {message}",
+        style="{",
+    )
+    ubwa = BinanceWebSocketApiManager(exchange="binance.com")
     try:
         asyncio.run(binance_stream(ubwa))
     except KeyboardInterrupt:

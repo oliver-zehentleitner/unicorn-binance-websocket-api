@@ -36,41 +36,143 @@ import time
 import os
 
 logging.getLogger("unicorn_binance_websocket_api")
-logging.basicConfig(level=logging.INFO,
-                    filename=os.path.basename(__file__) + '.log',
-                    format="{asctime} [{levelname:8}] {process} {thread} {module}: {message}",
-                    style="{")
+logging.basicConfig(
+    level=logging.INFO,
+    filename=os.path.basename(__file__) + ".log",
+    format="{asctime} [{levelname:8}] {process} {thread} {module}: {message}",
+    style="{",
+)
 
 # create instance of BinanceWebSocketApiManager and provide the function for stream processing
 binance_websocket_api_manager = BinanceWebSocketApiManager()
 
 # define some markets
-markets = {'bnbbtc', 'ethbtc', 'btcusdt', 'bchabcusdt', 'xrpusdt', 'rvnbtc', 'ltcusdt', 'adausdt', 'eosusdt',
-           'neousdt', 'bnbusdt', 'adabtc', 'ethusdt', 'trxbtc', 'bchabcbtc', 'ltcbtc', 'xrpbtc',
-           'ontbtc', 'bttusdt', 'eosbtc', 'xlmbtc', 'bttbtc', 'tusdusdt', 'xlmusdt', 'qkcbtc', 'zrxbtc',
-           'neobtc', 'adaeth', 'icxusdt', 'btctusd', 'icxbtc', 'btcusdc', 'wanbtc', 'zecbtc', 'wtcbtc',
-           'ethtusd', 'batusdt', 'mcobtc', 'neoeth', 'bntbtc', 'eostusd', 'lrcbtc', 'funbtc', 'zecusdt',
-           'bnbpax', 'linkusdt', 'hceth', 'zrxeth', 'icxeth', 'xmreth', 'neobnb', 'etceth', 'zeceth', 'xmrbnb',
-           'wanbnb', 'zrxbnb', 'agibnb', 'funeth', 'arketh', 'engeth'}
+markets = {
+    "bnbbtc",
+    "ethbtc",
+    "btcusdt",
+    "bchabcusdt",
+    "xrpusdt",
+    "rvnbtc",
+    "ltcusdt",
+    "adausdt",
+    "eosusdt",
+    "neousdt",
+    "bnbusdt",
+    "adabtc",
+    "ethusdt",
+    "trxbtc",
+    "bchabcbtc",
+    "ltcbtc",
+    "xrpbtc",
+    "ontbtc",
+    "bttusdt",
+    "eosbtc",
+    "xlmbtc",
+    "bttbtc",
+    "tusdusdt",
+    "xlmusdt",
+    "qkcbtc",
+    "zrxbtc",
+    "neobtc",
+    "adaeth",
+    "icxusdt",
+    "btctusd",
+    "icxbtc",
+    "btcusdc",
+    "wanbtc",
+    "zecbtc",
+    "wtcbtc",
+    "ethtusd",
+    "batusdt",
+    "mcobtc",
+    "neoeth",
+    "bntbtc",
+    "eostusd",
+    "lrcbtc",
+    "funbtc",
+    "zecusdt",
+    "bnbpax",
+    "linkusdt",
+    "hceth",
+    "zrxeth",
+    "icxeth",
+    "xmreth",
+    "neobnb",
+    "etceth",
+    "zeceth",
+    "xmrbnb",
+    "wanbnb",
+    "zrxbnb",
+    "agibnb",
+    "funeth",
+    "arketh",
+    "engeth",
+}
 
 # create stream 1
-binance_get_ticker_stream_id = binance_websocket_api_manager.create_stream("arr", "!ticker")
+binance_get_ticker_stream_id = binance_websocket_api_manager.create_stream(
+    "arr", "!ticker"
+)
 
 # create stream 2
-binance_get_kline_stream_id = binance_websocket_api_manager.create_stream(['kline_1m', 'kline_5m', 'kline_30m', 'kline_1h', 'kline_15m'], markets)
-binance_get_trade_stream_id = binance_websocket_api_manager.create_stream(['trade'], markets)
+binance_get_kline_stream_id = binance_websocket_api_manager.create_stream(
+    ["kline_1m", "kline_5m", "kline_30m", "kline_1h", "kline_15m"], markets
+)
+binance_get_trade_stream_id = binance_websocket_api_manager.create_stream(
+    ["trade"], markets
+)
 
 time.sleep(5)
 
 # replace stream 1 with stream 3 (stream 1 will not get stopped till stream 3 received its first data row
-binance_get_multi_stream_id = binance_websocket_api_manager.replace_stream(binance_get_ticker_stream_id, ['trade', 'depth', 'depth10', 'aggTrade', 'miniTicker'], markets)
+binance_get_multi_stream_id = binance_websocket_api_manager.replace_stream(
+    binance_get_ticker_stream_id,
+    ["trade", "depth", "depth10", "aggTrade", "miniTicker"],
+    markets,
+)
 
 # subscribe new markets to a stream
-markets = ['engbtc', 'zileth', 'xlmeth', 'eosbnb', 'xrppax', 'lskbtc', 'npxsbtc', 'xmrusdt', 'ltcpax', 'xmrusdt',
-           'ethtusd', 'batusdt', 'mcobtc', 'neoeth', 'bntbtc', 'eostusd', 'lrcbtc', 'funbtc', 'zecusdt',
-           'bnbpax', 'linkusdt', 'hceth', 'zrxeth', 'icxeth', 'xmreth', 'neobnb', 'etceth', 'zeceth', 'xmrbnb',
-           'wanbnb', 'zrxbnb', 'agibnb', 'funeth', 'arketh', 'engeth']
-binance_websocket_api_manager.subscribe_to_stream(binance_get_multi_stream_id, markets=markets)
+markets = [
+    "engbtc",
+    "zileth",
+    "xlmeth",
+    "eosbnb",
+    "xrppax",
+    "lskbtc",
+    "npxsbtc",
+    "xmrusdt",
+    "ltcpax",
+    "xmrusdt",
+    "ethtusd",
+    "batusdt",
+    "mcobtc",
+    "neoeth",
+    "bntbtc",
+    "eostusd",
+    "lrcbtc",
+    "funbtc",
+    "zecusdt",
+    "bnbpax",
+    "linkusdt",
+    "hceth",
+    "zrxeth",
+    "icxeth",
+    "xmreth",
+    "neobnb",
+    "etceth",
+    "zeceth",
+    "xmrbnb",
+    "wanbnb",
+    "zrxbnb",
+    "agibnb",
+    "funeth",
+    "arketh",
+    "engeth",
+]
+binance_websocket_api_manager.subscribe_to_stream(
+    binance_get_multi_stream_id, markets=markets
+)
 time.sleep(3)
 binance_websocket_api_manager.get_stream_subscriptions(binance_get_multi_stream_id)
 
@@ -79,5 +181,7 @@ while True:
     binance_websocket_api_manager.print_stream_info(binance_get_multi_stream_id)
     binance_websocket_api_manager.print_stream_info(binance_get_ticker_stream_id)
     binance_websocket_api_manager.print_stream_info(binance_get_kline_stream_id)
-    binance_websocket_api_manager.print_summary(add_string="custom text: YOUR TEXT HERE ;)")
+    binance_websocket_api_manager.print_summary(
+        add_string="custom text: YOUR TEXT HERE ;)"
+    )
     time.sleep(1)

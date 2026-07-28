@@ -36,19 +36,22 @@ import time
 import threading
 import os
 
-
 logging.getLogger("unicorn_binance_websocket_api")
-logging.basicConfig(level=logging.INFO,
-                    filename=os.path.basename(__file__) + '.log',
-                    format="{asctime} [{levelname:8}] {process} {thread} {module}: {message}",
-                    style="{")
+logging.basicConfig(
+    level=logging.INFO,
+    filename=os.path.basename(__file__) + ".log",
+    format="{asctime} [{levelname:8}] {process} {thread} {module}: {message}",
+    style="{",
+)
 
 
 def print_stream_data_from_stream_buffer(binance_websocket_api_manager):
     while True:
         if binance_websocket_api_manager.is_manager_stopping():
             exit(0)
-        oldest_stream_data_from_stream_buffer = binance_websocket_api_manager.pop_stream_data_from_stream_buffer()
+        oldest_stream_data_from_stream_buffer = (
+            binance_websocket_api_manager.pop_stream_data_from_stream_buffer()
+        )
         if oldest_stream_data_from_stream_buffer is None:
             time.sleep(0.01)
         else:
@@ -69,43 +72,63 @@ binance_com_iso_api_key = binance_com_api_key
 binance_com_iso_api_secret = binance_com_api_secret
 
 # create instances of BinanceWebSocketApiManager
-binance_com_websocket_api_manager = BinanceWebSocketApiManager(exchange="binance.com",
-                                                               throw_exception_if_unrepairable=True)
+binance_com_websocket_api_manager = BinanceWebSocketApiManager(
+    exchange="binance.com", throw_exception_if_unrepairable=True
+)
 binance_us_websocket_api_manager = BinanceWebSocketApiManager(exchange="binance.us")
-binance_com_isolated_websocket_api_manager = BinanceWebSocketApiManager(exchange="binance.com-isolated_margin")
+binance_com_isolated_websocket_api_manager = BinanceWebSocketApiManager(
+    exchange="binance.com-isolated_margin"
+)
 
 # create the userData streams
-binance_com_user_data_stream_id = binance_com_websocket_api_manager.create_stream('arr', '!userData',
-                                                                                  api_key=binance_com_api_key,
-                                                                                  api_secret=binance_com_api_secret)
-binance_us_user_data_stream_id = binance_us_websocket_api_manager.create_stream('arr', '!userData',
-                                                                                api_key=binance_us_api_key,
-                                                                                api_secret=binance_us_api_secret)
-binance_com_iso_user_data_stream_id = binance_com_isolated_websocket_api_manager.create_stream('arr', '!userData',
-                                                                                               symbols="BTCUSDT",
-                                                                                               api_key=binance_com_iso_api_key,
-                                                                                               api_secret=binance_com_iso_api_secret)
+binance_com_user_data_stream_id = binance_com_websocket_api_manager.create_stream(
+    "arr", "!userData", api_key=binance_com_api_key, api_secret=binance_com_api_secret
+)
+binance_us_user_data_stream_id = binance_us_websocket_api_manager.create_stream(
+    "arr", "!userData", api_key=binance_us_api_key, api_secret=binance_us_api_secret
+)
+binance_com_iso_user_data_stream_id = (
+    binance_com_isolated_websocket_api_manager.create_stream(
+        "arr",
+        "!userData",
+        symbols="BTCUSDT",
+        api_key=binance_com_iso_api_key,
+        api_secret=binance_com_iso_api_secret,
+    )
+)
 
 # start a worker process to move the received stream_data from the stream_buffer to a print function
-worker_thread = threading.Thread(target=print_stream_data_from_stream_buffer, args=(binance_com_websocket_api_manager,))
+worker_thread = threading.Thread(
+    target=print_stream_data_from_stream_buffer,
+    args=(binance_com_websocket_api_manager,),
+)
 worker_thread.start()
-worker_thread = threading.Thread(target=print_stream_data_from_stream_buffer, args=(binance_us_websocket_api_manager,))
+worker_thread = threading.Thread(
+    target=print_stream_data_from_stream_buffer,
+    args=(binance_us_websocket_api_manager,),
+)
 worker_thread.start()
-worker_thread = threading.Thread(target=print_stream_data_from_stream_buffer,
-                                 args=(binance_com_isolated_websocket_api_manager,))
+worker_thread = threading.Thread(
+    target=print_stream_data_from_stream_buffer,
+    args=(binance_com_isolated_websocket_api_manager,),
+)
 worker_thread.start()
 
 # monitor the streams
 round = 0
 while True:
-    binance_com_isolated_websocket_api_manager.print_stream_info(binance_com_iso_user_data_stream_id)
+    binance_com_isolated_websocket_api_manager.print_stream_info(
+        binance_com_iso_user_data_stream_id
+    )
     binance_com_websocket_api_manager.print_summary()
     binance_us_websocket_api_manager.print_summary()
     binance_com_isolated_websocket_api_manager.print_summary()
     time.sleep(3)
     round += 1
     if round >= 7:
-        binance_com_isolated_websocket_api_manager.stop_stream(binance_com_iso_user_data_stream_id)
+        binance_com_isolated_websocket_api_manager.stop_stream(
+            binance_com_iso_user_data_stream_id
+        )
         break
 
 print("Stopping ...")

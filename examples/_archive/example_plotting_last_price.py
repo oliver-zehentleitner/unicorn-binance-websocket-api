@@ -32,6 +32,7 @@
 
 import unicorn_binance_websocket_api.manager as ubwam
 import datetime as dt
+
 try:
     import matplotlib.pyplot as plt
     import matplotlib.animation as animation
@@ -55,15 +56,15 @@ print("Please wait a few seconds until enough data has been received!")
 def animate(i, xs, ys):
     data = binance_websocket_api_manager.pop_stream_data_from_stream_buffer()
     try:
-        if data['stream_type']:
-            xs.append(dt.datetime.fromtimestamp(data['trade_time'] / 1000))
-            ys.append(float(data['price']))
+        if data["stream_type"]:
+            xs.append(dt.datetime.fromtimestamp(data["trade_time"] / 1000))
+            ys.append(float(data["price"]))
             ax.clear()
             ax.plot(xs, ys)
-            plt.xticks(rotation=45, ha='right')
+            plt.xticks(rotation=45, ha="right")
             plt.subplots_adjust(bottom=0.30)
             plt.title(title)
-            plt.ylabel('USDT Value')
+            plt.ylabel("USDT Value")
     except KeyError:
         pass
     except TypeError:

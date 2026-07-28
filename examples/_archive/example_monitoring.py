@@ -39,19 +39,22 @@ import sys
 import time
 import threading
 
-
 logging.getLogger("unicorn_binance_websocket_api")
-logging.basicConfig(level=logging.DEBUG,
-                    filename=os.path.basename(__file__) + '.log',
-                    format="{asctime} [{levelname:8}] {process} {thread} {module}: {message}",
-                    style="{")
+logging.basicConfig(
+    level=logging.DEBUG,
+    filename=os.path.basename(__file__) + ".log",
+    format="{asctime} [{levelname:8}] {process} {thread} {module}: {message}",
+    style="{",
+)
 
 
 def print_stream_data_from_stream_buffer(binance_websocket_api_manager):
     while True:
         if binance_websocket_api_manager.is_manager_stopping():
             sys.exit(0)
-        oldest_stream_data_from_stream_buffer = binance_websocket_api_manager.pop_stream_data_from_stream_buffer()
+        oldest_stream_data_from_stream_buffer = (
+            binance_websocket_api_manager.pop_stream_data_from_stream_buffer()
+        )
         if oldest_stream_data_from_stream_buffer is None:
             time.sleep(0.01)
         else:
@@ -62,7 +65,9 @@ def print_stream_data_from_stream_buffer(binance_websocket_api_manager):
             except KeyError:
                 # Any kind of error...
                 # not able to process the data? write it back to the stream_buffer to pick it up later.
-                binance_websocket_api_manager.add_to_stream_buffer(oldest_stream_data_from_stream_buffer)
+                binance_websocket_api_manager.add_to_stream_buffer(
+                    oldest_stream_data_from_stream_buffer
+                )
 
 
 # create instance of BinanceWebSocketApiManager and provide the function for stream processing
@@ -72,18 +77,113 @@ ubwa = BinanceWebSocketApiManager()
 ticker_all_stream_id = ubwa.create_stream(["arr"], ["!ticker"])
 miniticker_stream_id = ubwa.create_stream(["arr"], ["!miniTicker"])
 
-markets = {'bnbbtc', 'ethbtc', 'btcusdt', 'bchabcusdt', 'xrpusdt', 'rvnbtc', 'ltcusdt', 'adausdt', 'eosusdt',
-           'neousdt', 'bnbusdt', 'adabtc', 'ethusdt', 'trxbtc', 'bchabcbtc', 'ltcbtc', 'xrpbtc',
-           'ontbtc', 'bttusdt', 'eosbtc', 'xlmbtc', 'bttbtc', 'tusdusdt', 'xlmusdt', 'qkcbtc', 'zrxbtc',
-           'neobtc', 'adaeth', 'icxusdt', 'btctusd', 'icxbtc', 'btcusdc', 'wanbtc', 'zecbtc', 'wtcbtc',
-           'batbtc', 'adabnb', 'etcusdt', 'qtumusdt', 'xmrbtc', 'trxeth', 'adatusd', 'trxxrp', 'trxbnb',
-           'dashbtc', 'rvnbnb', 'bchabctusd', 'etcbtc', 'bnbeth', 'ethpax', 'nanobtc', 'xembtc', 'xrpbnb',
-           'bchabcpax', 'xrpeth', 'bttbnb', 'ltcbnb', 'agibtc', 'zrxusdt', 'xlmbnb', 'ltceth', 'eoseth',
-           'ltctusd', 'polybnb', 'scbtc', 'steembtc', 'trxtusd', 'npxseth', 'kmdbtc', 'polybtc', 'gasbtc',
-           'engbtc', 'zileth', 'xlmeth', 'eosbnb', 'xrppax', 'lskbtc', 'npxsbtc', 'xmrusdt', 'ltcpax',
-           'ethtusd', 'batusdt', 'mcobtc', 'neoeth', 'bntbtc', 'eostusd', 'lrcbtc', 'funbtc', 'zecusdt',
-           'bnbpax', 'linkusdt', 'hceth', 'zrxeth', 'icxeth', 'xmreth', 'neobnb', 'etceth', 'zeceth', 'xmrbnb',
-           'wanbnb', 'zrxbnb', 'agibnb', 'funeth', 'arketh', 'engeth'}
+markets = {
+    "bnbbtc",
+    "ethbtc",
+    "btcusdt",
+    "bchabcusdt",
+    "xrpusdt",
+    "rvnbtc",
+    "ltcusdt",
+    "adausdt",
+    "eosusdt",
+    "neousdt",
+    "bnbusdt",
+    "adabtc",
+    "ethusdt",
+    "trxbtc",
+    "bchabcbtc",
+    "ltcbtc",
+    "xrpbtc",
+    "ontbtc",
+    "bttusdt",
+    "eosbtc",
+    "xlmbtc",
+    "bttbtc",
+    "tusdusdt",
+    "xlmusdt",
+    "qkcbtc",
+    "zrxbtc",
+    "neobtc",
+    "adaeth",
+    "icxusdt",
+    "btctusd",
+    "icxbtc",
+    "btcusdc",
+    "wanbtc",
+    "zecbtc",
+    "wtcbtc",
+    "batbtc",
+    "adabnb",
+    "etcusdt",
+    "qtumusdt",
+    "xmrbtc",
+    "trxeth",
+    "adatusd",
+    "trxxrp",
+    "trxbnb",
+    "dashbtc",
+    "rvnbnb",
+    "bchabctusd",
+    "etcbtc",
+    "bnbeth",
+    "ethpax",
+    "nanobtc",
+    "xembtc",
+    "xrpbnb",
+    "bchabcpax",
+    "xrpeth",
+    "bttbnb",
+    "ltcbnb",
+    "agibtc",
+    "zrxusdt",
+    "xlmbnb",
+    "ltceth",
+    "eoseth",
+    "ltctusd",
+    "polybnb",
+    "scbtc",
+    "steembtc",
+    "trxtusd",
+    "npxseth",
+    "kmdbtc",
+    "polybtc",
+    "gasbtc",
+    "engbtc",
+    "zileth",
+    "xlmeth",
+    "eosbnb",
+    "xrppax",
+    "lskbtc",
+    "npxsbtc",
+    "xmrusdt",
+    "ltcpax",
+    "ethtusd",
+    "batusdt",
+    "mcobtc",
+    "neoeth",
+    "bntbtc",
+    "eostusd",
+    "lrcbtc",
+    "funbtc",
+    "zecusdt",
+    "bnbpax",
+    "linkusdt",
+    "hceth",
+    "zrxeth",
+    "icxeth",
+    "xmreth",
+    "neobnb",
+    "etceth",
+    "zeceth",
+    "xmrbnb",
+    "wanbnb",
+    "zrxbnb",
+    "agibnb",
+    "funeth",
+    "arketh",
+    "engeth",
+}
 
 ubwa.create_stream(["aggTrade"], markets)
 ubwa.create_stream(["trade"], markets)
@@ -101,22 +201,77 @@ ubwa.create_stream(["depth10"], markets)
 ubwa.create_stream(["depth20"], markets)
 ubwa.create_stream(["aggTrade"], markets)
 
-markets = {'bnbbtc', 'ethbtc', 'btcusdt', 'bchabcusdt', 'xrpusdt', 'rvnbtc', 'ltcusdt', 'adausdt', 'eosusdt',
-           'neobtc', 'adaeth', 'icxusdt', 'btctusd', 'icxbtc', 'btcusdc', 'wanbtc', 'zecbtc', 'wtcbtc',
-           'batbtc', 'adabnb', 'etcusdt', 'qtumusdt', 'xmrbtc', 'trxeth', 'adatusd', 'trxxrp', 'trxbnb',
-           'ltctusd', 'polybnb', 'scbtc', 'steembtc', 'trxtusd', 'npxseth', 'kmdbtc', 'polybtc', 'gasbtc',
-           'bnbpax', 'linkusdt', 'hceth', 'zrxeth', 'icxeth', 'xmreth', 'neobnb', 'etceth', 'zeceth', 'xmrbnb'}
-channels = {'trade', 'kline_1m', 'kline_5m', 'kline_15m', 'kline_30m', 'kline_1h', 'kline_12h', 'kline_1w',
-            'miniTicker', 'depth20'}
+markets = {
+    "bnbbtc",
+    "ethbtc",
+    "btcusdt",
+    "bchabcusdt",
+    "xrpusdt",
+    "rvnbtc",
+    "ltcusdt",
+    "adausdt",
+    "eosusdt",
+    "neobtc",
+    "adaeth",
+    "icxusdt",
+    "btctusd",
+    "icxbtc",
+    "btcusdc",
+    "wanbtc",
+    "zecbtc",
+    "wtcbtc",
+    "batbtc",
+    "adabnb",
+    "etcusdt",
+    "qtumusdt",
+    "xmrbtc",
+    "trxeth",
+    "adatusd",
+    "trxxrp",
+    "trxbnb",
+    "ltctusd",
+    "polybnb",
+    "scbtc",
+    "steembtc",
+    "trxtusd",
+    "npxseth",
+    "kmdbtc",
+    "polybtc",
+    "gasbtc",
+    "bnbpax",
+    "linkusdt",
+    "hceth",
+    "zrxeth",
+    "icxeth",
+    "xmreth",
+    "neobnb",
+    "etceth",
+    "zeceth",
+    "xmrbnb",
+}
+channels = {
+    "trade",
+    "kline_1m",
+    "kline_5m",
+    "kline_15m",
+    "kline_30m",
+    "kline_1h",
+    "kline_12h",
+    "kline_1w",
+    "miniTicker",
+    "depth20",
+}
 ubwa.create_stream(channels, markets)
 
 # start a worker process to process to move the received stream_data from the stream_buffer to a print function
-worker_thread = threading.Thread(target=print_stream_data_from_stream_buffer, args=(ubwa,))
+worker_thread = threading.Thread(
+    target=print_stream_data_from_stream_buffer, args=(ubwa,)
+)
 worker_thread.start()
 
 # start a restful api server to report the current status to 'tools/icinga/check_binance_websocket_manager' which can be
 # used as a check_command for ICINGA/Nagios
-#ubwa.start_monitoring_api(warn_on_update=False)
+# ubwa.start_monitoring_api(warn_on_update=False)
 ubwa.start_monitoring_api()
 
 # if you like to not only listen on localhost use 'host="0.0.0.0"'
@@ -124,5 +279,7 @@ ubwa.start_monitoring_api()
 # ubwa.start_monitoring_api(host="0.0.0.0", port=80)
 
 print("18 websockets started!")
-print("Continue here: https://github.com/oliver-zehentleitner/unicorn-binance-websocket-api/wiki/"
-      "UNICORN-Monitoring-API-Service")
+print(
+    "Continue here: https://github.com/oliver-zehentleitner/unicorn-binance-websocket-api/wiki/"
+    "UNICORN-Monitoring-API-Service"
+)

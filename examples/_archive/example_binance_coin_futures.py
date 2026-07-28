@@ -40,39 +40,48 @@ import threading
 import os
 
 logging.getLogger("unicorn_binance_websocket_api")
-logging.basicConfig(level=logging.DEBUG,
-                    filename=os.path.basename(__file__) + '.log',
-                    format="{asctime} [{levelname:8}] {process} {thread} {module}: {message}",
-                    style="{")
+logging.basicConfig(
+    level=logging.DEBUG,
+    filename=os.path.basename(__file__) + ".log",
+    format="{asctime} [{levelname:8}] {process} {thread} {module}: {message}",
+    style="{",
+)
 
 
 def print_stream_data_from_stream_buffer(binance_websocket_api_manager):
     while True:
         if binance_websocket_api_manager.is_manager_stopping():
             exit(0)
-        oldest_stream_data_from_stream_buffer = binance_websocket_api_manager.pop_stream_data_from_stream_buffer()
+        oldest_stream_data_from_stream_buffer = (
+            binance_websocket_api_manager.pop_stream_data_from_stream_buffer()
+        )
         if oldest_stream_data_from_stream_buffer is None:
             time.sleep(0.01)
 
 
 # create instance of BinanceWebSocketApiManager for Binance.com Futures
-binance_websocket_api_manager = BinanceWebSocketApiManager(exchange="binance.com-coin_futures")
+binance_websocket_api_manager = BinanceWebSocketApiManager(
+    exchange="binance.com-coin_futures"
+)
 
 # set api key and secret for userData stream
 binance_api_key = ""
 binance_api_secret = ""
-userdata_stream_id = binance_websocket_api_manager.create_stream(["arr"],
-                                                                 ["!userData"],
-                                                                 api_key=binance_api_key,
-                                                                 api_secret=binance_api_secret)
+userdata_stream_id = binance_websocket_api_manager.create_stream(
+    ["arr"], ["!userData"], api_key=binance_api_key, api_secret=binance_api_secret
+)
 
-bookticker_all_stream_id = binance_websocket_api_manager.create_stream(["arr"], ["!bookTicker"])
+bookticker_all_stream_id = binance_websocket_api_manager.create_stream(
+    ["arr"], ["!bookTicker"]
+)
 
 # https://binance-docs.github.io/apidocs/delivery/en/#mark-price-of-all-symbols-of-a-pair
-stream_id = binance_websocket_api_manager.create_stream(["markPrice@1s"], "btcusd", stream_label="BTCUSD@arr@1s")
+stream_id = binance_websocket_api_manager.create_stream(
+    ["markPrice@1s"], "btcusd", stream_label="BTCUSD@arr@1s"
+)
 
-symbols = {'btcusd_perp', 'ethusd_perp', 'bnbusd_perp'}
-pairs = {'btcusd', 'ethusd', 'bnbusd'}
+symbols = {"btcusd_perp", "ethusd_perp", "bnbusd_perp"}
+pairs = {"btcusd", "ethusd", "bnbusd"}
 binance_websocket_api_manager.create_stream(["aggTrade"], symbols)
 binance_websocket_api_manager.create_stream(["markPrice"], pairs)
 binance_websocket_api_manager.create_stream(["markPriceKline_1m"], symbols)
@@ -81,7 +90,9 @@ binance_websocket_api_manager.create_stream(["depth5@100ms"], symbols)
 binance_websocket_api_manager.create_stream(["depth10"], symbols)
 
 # start a worker process to move the received stream_data from the stream_buffer to a print function
-worker_thread = threading.Thread(target=print_stream_data_from_stream_buffer, args=(binance_websocket_api_manager,))
+worker_thread = threading.Thread(
+    target=print_stream_data_from_stream_buffer, args=(binance_websocket_api_manager,)
+)
 worker_thread.start()
 
 # show an overview

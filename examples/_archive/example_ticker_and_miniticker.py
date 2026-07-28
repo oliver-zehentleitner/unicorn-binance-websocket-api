@@ -40,13 +40,17 @@ import logging
 from example_process_streams import BinanceWebSocketApiProcessStreams
 
 logging.getLogger("unicorn_binance_websocket_api")
-logging.basicConfig(level=logging.DEBUG,
-                    filename=os.path.basename(__file__) + '.log',
-                    format="{asctime} [{levelname:8}] {process} {thread} {module}: {message}",
-                    style="{")
+logging.basicConfig(
+    level=logging.DEBUG,
+    filename=os.path.basename(__file__) + ".log",
+    format="{asctime} [{levelname:8}] {process} {thread} {module}: {message}",
+    style="{",
+)
 
 # create instance of BinanceWebSocketApiManager and provide the function for stream processing
-binance_websocket_api_manager = BinanceWebSocketApiManager(BinanceWebSocketApiProcessStreams.process_stream_data)
+binance_websocket_api_manager = BinanceWebSocketApiManager(
+    BinanceWebSocketApiProcessStreams.process_stream_data
+)
 # binance_websocket_api_manager = BinanceWebSocketApiManager(exchange="binance.com")
 
 
@@ -54,46 +58,72 @@ def print_stream_data_from_stream_buffer(binance_websocket_api_manager):
     while True:
         if binance_websocket_api_manager.is_manager_stopping():
             exit(0)
-        oldest_stream_data_from_stream_buffer = binance_websocket_api_manager.pop_stream_data_from_stream_buffer()
+        oldest_stream_data_from_stream_buffer = (
+            binance_websocket_api_manager.pop_stream_data_from_stream_buffer()
+        )
         if oldest_stream_data_from_stream_buffer is None:
             time.sleep(0.01)
         else:
-            #pass
+            # pass
             print(oldest_stream_data_from_stream_buffer)
 
 
 # start a worker process to move the received stream_data from the stream_buffer to a print function
-worker_thread = threading.Thread(target=print_stream_data_from_stream_buffer, args=(binance_websocket_api_manager,))
+worker_thread = threading.Thread(
+    target=print_stream_data_from_stream_buffer, args=(binance_websocket_api_manager,)
+)
 worker_thread.start()
 
 # create streams
-print("\r\n========================================== Starting ticker all ========================================\r\n")
+print(
+    "\r\n========================================== Starting ticker all ========================================\r\n"
+)
 ticker_arr_stream_id = binance_websocket_api_manager.create_stream("arr", "!ticker")
 time.sleep(7)
 binance_websocket_api_manager.stop_stream(ticker_arr_stream_id)
 time.sleep(2)
-print("\r\n=========================================== Stopp ticker all ==========================================\r\n")
+print(
+    "\r\n=========================================== Stopp ticker all ==========================================\r\n"
+)
 
-print("\r\n============================================ Starting ticker ==========================================\r\n")
-ticker_stream_id = binance_websocket_api_manager.create_stream("ticker", ['bnbbtc', 'ethbtc'])
+print(
+    "\r\n============================================ Starting ticker ==========================================\r\n"
+)
+ticker_stream_id = binance_websocket_api_manager.create_stream(
+    "ticker", ["bnbbtc", "ethbtc"]
+)
 time.sleep(7)
 binance_websocket_api_manager.stop_stream(ticker_stream_id)
 time.sleep(2)
-print("\r\n============================================== Stop ticker  ===========================================\r\n")
+print(
+    "\r\n============================================== Stop ticker  ===========================================\r\n"
+)
 
-print("\r\n======================================== Starting !miniTicker arr =====================================\r\n")
-miniTicker_arr_stream_id = binance_websocket_api_manager.create_stream("arr", "!miniTicker")
+print(
+    "\r\n======================================== Starting !miniTicker arr =====================================\r\n"
+)
+miniTicker_arr_stream_id = binance_websocket_api_manager.create_stream(
+    "arr", "!miniTicker"
+)
 time.sleep(7)
 binance_websocket_api_manager.stop_stream(miniTicker_arr_stream_id)
 time.sleep(2)
-print("\r\n========================================== Stop !miniTicker arr =======================================\r\n")
+print(
+    "\r\n========================================== Stop !miniTicker arr =======================================\r\n"
+)
 
-print("\r\n========================================== Starting miniTicker ========================================\r\n")
-miniTicker_stream_id = binance_websocket_api_manager.create_stream("miniTicker", ['bnbbtc', 'ethbtc'])
+print(
+    "\r\n========================================== Starting miniTicker ========================================\r\n"
+)
+miniTicker_stream_id = binance_websocket_api_manager.create_stream(
+    "miniTicker", ["bnbbtc", "ethbtc"]
+)
 time.sleep(7)
 binance_websocket_api_manager.stop_stream(miniTicker_stream_id)
 time.sleep(2)
-print("\r\n============================================ Stop miniTicker==========================================\r\n")
+print(
+    "\r\n============================================ Stop miniTicker==========================================\r\n"
+)
 
 binance_websocket_api_manager.print_summary()
 

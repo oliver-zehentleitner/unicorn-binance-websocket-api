@@ -37,6 +37,7 @@ import asyncio
 import logging
 import os
 import tracemalloc
+
 tracemalloc.start(25)
 
 # socks5_proxy = "127.0.0.1:1080"
@@ -51,27 +52,35 @@ async def binance_stream(ubwa):
     def handle_socket_message(data):
         print(f"received data: {data}")
 
-    ubwa.create_stream(markets='arr', channels='!userData',
-                       api_key=api_key, api_secret=api_secret,
-                       stream_label="Bobs UserData",
-                       process_stream_data=handle_socket_message)
+    ubwa.create_stream(
+        markets="arr",
+        channels="!userData",
+        api_key=api_key,
+        api_secret=api_secret,
+        stream_label="Bobs UserData",
+        process_stream_data=handle_socket_message,
+    )
 
     while ubwa.is_manager_stopping() is False:
         await asyncio.sleep(1)
         ubwa.print_summary()
-        #ubwa.print_stream_info(ubwa.get_stream_id_by_label("Bobs UserData"))
+        # ubwa.print_stream_info(ubwa.get_stream_id_by_label("Bobs UserData"))
 
 
 if __name__ == "__main__":
-    logging.basicConfig(level=logging.DEBUG,
-                        filename=os.path.basename(__file__) + '.log',
-                        format="{asctime} [{levelname:8}] {process} {thread} {module}: {message}",
-                        style="{")
+    logging.basicConfig(
+        level=logging.DEBUG,
+        filename=os.path.basename(__file__) + ".log",
+        format="{asctime} [{levelname:8}] {process} {thread} {module}: {message}",
+        style="{",
+    )
     try:
-        ubwa = BinanceWebSocketApiManager(exchange='binance.com',
-                                          show_secrets_in_logs=True,
-                                          socks5_proxy_server=socks5_proxy,
-                                          socks5_proxy_ssl_verification=socks5_ssl_verification)
+        ubwa = BinanceWebSocketApiManager(
+            exchange="binance.com",
+            show_secrets_in_logs=True,
+            socks5_proxy_server=socks5_proxy,
+            socks5_proxy_ssl_verification=socks5_ssl_verification,
+        )
     except Socks5ProxyConnectionError as error_msg:
         print(f"Socks5ProxyConnectionError: {error_msg}")
         exit(1)

@@ -33,7 +33,6 @@
 from unicorn_binance_websocket_api.manager import BinanceWebSocketApiManager
 import time
 
-
 api_key = ""
 api_secret = ""
 
@@ -48,8 +47,10 @@ def order_status(msg):
 
 bwsm = BinanceWebSocketApiManager()
 
-book_ticker_id = bwsm.create_stream("bookTicker", 'bnbbusd', stream_buffer_name=True)
-user_stream_id = bwsm.create_stream('arr', '!userData', api_key=api_key, api_secret=api_secret, stream_buffer_name=True)
+book_ticker_id = bwsm.create_stream("bookTicker", "bnbbusd", stream_buffer_name=True)
+user_stream_id = bwsm.create_stream(
+    "arr", "!userData", api_key=api_key, api_secret=api_secret, stream_buffer_name=True
+)
 
 while True:
     msg = bwsm.pop_stream_data_from_stream_buffer(book_ticker_id)

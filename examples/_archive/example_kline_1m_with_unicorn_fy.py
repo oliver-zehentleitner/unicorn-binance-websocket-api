@@ -35,51 +35,157 @@ import logging
 import time
 import os
 
-
 logging.getLogger("unicorn_binance_websocket_api")
-logging.basicConfig(level=logging.INFO,
-                    filename=os.path.basename(__file__) + '.log',
-                    format="{asctime} [{levelname:8}] {process} {thread} {module}: {message}",
-                    style="{")
+logging.basicConfig(
+    level=logging.INFO,
+    filename=os.path.basename(__file__) + ".log",
+    format="{asctime} [{levelname:8}] {process} {thread} {module}: {message}",
+    style="{",
+)
 
 # create instance of BinanceWebSocketApiManager
-binance_websocket_api_manager = BinanceWebSocketApiManager(exchange="binance.com", output_default="UnicornFy")
+binance_websocket_api_manager = BinanceWebSocketApiManager(
+    exchange="binance.com", output_default="UnicornFy"
+)
 
-markets = {'bnbbtc', 'ethbtc', 'btcusdt', 'bchabcusdt', 'xrpusdt', 'rvnbtc', 'ltcusdt', 'adausdt', 'eosusdt',
-           'neousdt', 'bnbusdt', 'adabtc', 'ethusdt', 'trxbtc', 'bchabcbtc', 'ltcbtc', 'xrpbtc',
-           'ontbtc', 'bttusdt', 'eosbtc', 'xlmbtc', 'bttbtc', 'tusdusdt', 'xlmusdt', 'qkcbtc', 'zrxbtc',
-           'neobtc', 'adaeth', 'icxusdt', 'btctusd', 'icxbtc', 'btcusdc', 'wanbtc', 'zecbtc', 'wtcbtc',
-           'batbtc', 'adabnb', 'etcusdt', 'qtumusdt', 'xmrbtc', 'trxeth', 'adatusd', 'trxxrp', 'trxbnb',
-           'dashbtc', 'rvnbnb', 'bchabctusd', 'etcbtc', 'bnbeth', 'ethpax', 'nanobtc', 'xembtc', 'xrpbnb',
-           'bchabcpax', 'xrpeth', 'bttbnb', 'ltcbnb', 'agibtc', 'zrxusdt', 'xlmbnb', 'ltceth', 'eoseth',
-           'ltctusd', 'polybnb', 'scbtc', 'steembtc', 'trxtusd', 'npxseth', 'kmdbtc', 'polybtc', 'gasbtc',
-           'engbtc', 'zileth', 'xlmeth', 'eosbnb', 'xrppax', 'lskbtc', 'npxsbtc', 'xmrusdt', 'ltcpax',
-           'ethtusd', 'batusdt', 'mcobtc', 'neoeth', 'bntbtc', 'eostusd', 'lrcbtc', 'funbtc', 'zecusdt',
-           'bnbpax', 'linkusdt', 'hceth', 'zrxeth', 'icxeth', 'xmreth', 'neobnb', 'etceth', 'zeceth', 'xmrbnb',
-           'wanbnb', 'zrxbnb', 'agibnb', 'funeth', 'arketh', 'engeth'}
+markets = {
+    "bnbbtc",
+    "ethbtc",
+    "btcusdt",
+    "bchabcusdt",
+    "xrpusdt",
+    "rvnbtc",
+    "ltcusdt",
+    "adausdt",
+    "eosusdt",
+    "neousdt",
+    "bnbusdt",
+    "adabtc",
+    "ethusdt",
+    "trxbtc",
+    "bchabcbtc",
+    "ltcbtc",
+    "xrpbtc",
+    "ontbtc",
+    "bttusdt",
+    "eosbtc",
+    "xlmbtc",
+    "bttbtc",
+    "tusdusdt",
+    "xlmusdt",
+    "qkcbtc",
+    "zrxbtc",
+    "neobtc",
+    "adaeth",
+    "icxusdt",
+    "btctusd",
+    "icxbtc",
+    "btcusdc",
+    "wanbtc",
+    "zecbtc",
+    "wtcbtc",
+    "batbtc",
+    "adabnb",
+    "etcusdt",
+    "qtumusdt",
+    "xmrbtc",
+    "trxeth",
+    "adatusd",
+    "trxxrp",
+    "trxbnb",
+    "dashbtc",
+    "rvnbnb",
+    "bchabctusd",
+    "etcbtc",
+    "bnbeth",
+    "ethpax",
+    "nanobtc",
+    "xembtc",
+    "xrpbnb",
+    "bchabcpax",
+    "xrpeth",
+    "bttbnb",
+    "ltcbnb",
+    "agibtc",
+    "zrxusdt",
+    "xlmbnb",
+    "ltceth",
+    "eoseth",
+    "ltctusd",
+    "polybnb",
+    "scbtc",
+    "steembtc",
+    "trxtusd",
+    "npxseth",
+    "kmdbtc",
+    "polybtc",
+    "gasbtc",
+    "engbtc",
+    "zileth",
+    "xlmeth",
+    "eosbnb",
+    "xrppax",
+    "lskbtc",
+    "npxsbtc",
+    "xmrusdt",
+    "ltcpax",
+    "ethtusd",
+    "batusdt",
+    "mcobtc",
+    "neoeth",
+    "bntbtc",
+    "eostusd",
+    "lrcbtc",
+    "funbtc",
+    "zecusdt",
+    "bnbpax",
+    "linkusdt",
+    "hceth",
+    "zrxeth",
+    "icxeth",
+    "xmreth",
+    "neobnb",
+    "etceth",
+    "zeceth",
+    "xmrbnb",
+    "wanbnb",
+    "zrxbnb",
+    "agibnb",
+    "funeth",
+    "arketh",
+    "engeth",
+}
 
-binance_websocket_api_manager.create_stream('kline_1m', markets, stream_label="UnicornFy", output="UnicornFy")
+binance_websocket_api_manager.create_stream(
+    "kline_1m", markets, stream_label="UnicornFy", output="UnicornFy"
+)
 
-binance_websocket_api_manager.create_stream('kline_1m', markets, stream_label="dict", output="dict")
+binance_websocket_api_manager.create_stream(
+    "kline_1m", markets, stream_label="dict", output="dict"
+)
 
-binance_websocket_api_manager.create_stream('kline_1m', markets, stream_label="raw_data", output="raw_data")
+binance_websocket_api_manager.create_stream(
+    "kline_1m", markets, stream_label="raw_data", output="raw_data"
+)
 
 print(f"Printing the closing klines:")
 
 while True:
     if binance_websocket_api_manager.is_manager_stopping():
         exit(0)
-    oldest_stream_data_from_stream_buffer = binance_websocket_api_manager.pop_stream_data_from_stream_buffer()
+    oldest_stream_data_from_stream_buffer = (
+        binance_websocket_api_manager.pop_stream_data_from_stream_buffer()
+    )
     if oldest_stream_data_from_stream_buffer is None:
         time.sleep(0.01)
     else:
         if oldest_stream_data_from_stream_buffer is not None:
             try:
-                if oldest_stream_data_from_stream_buffer['kline']['is_closed']:
+                if oldest_stream_data_from_stream_buffer["kline"]["is_closed"]:
                     print(f"UnicornFy: {oldest_stream_data_from_stream_buffer}")
             except KeyError:
                 try:
-                    if oldest_stream_data_from_stream_buffer['k']['x']:
+                    if oldest_stream_data_from_stream_buffer["k"]["x"]:
                         print(f"dict: {oldest_stream_data_from_stream_buffer}")
                 except KeyError:
                     pass
