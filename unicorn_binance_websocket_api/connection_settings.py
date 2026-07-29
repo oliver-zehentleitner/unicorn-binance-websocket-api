@@ -91,7 +91,7 @@ CONNECTION_SETTINGS = {
     Exchanges.BINANCE_TESTNET: (
         1024,
         "wss://testnet.binance.vision/",
-        "wss://testnet.binance.vision/ws-api/v3",
+        "wss://ws-api.testnet.binance.vision/ws-api/v3",
     ),
     Exchanges.BINANCE_MARGIN: (
         1024,
@@ -101,7 +101,7 @@ CONNECTION_SETTINGS = {
     Exchanges.BINANCE_MARGIN_TESTNET: (
         1024,
         "wss://testnet.binance.vision/",
-        "wss://testnet.binance.vision/ws-api/v3",
+        "wss://ws-api.testnet.binance.vision/ws-api/v3",
     ),
     Exchanges.BINANCE_ISOLATED_MARGIN: (
         1024,
@@ -111,7 +111,7 @@ CONNECTION_SETTINGS = {
     Exchanges.BINANCE_ISOLATED_MARGIN_TESTNET: (
         1024,
         "wss://testnet.binance.vision/",
-        "wss://testnet.binance.vision/ws-api/v3",
+        "wss://ws-api.testnet.binance.vision/ws-api/v3",
     ),
     Exchanges.BINANCE_FUTURES: (
         200,
