@@ -489,7 +489,7 @@ class TestBinanceComManagerTest(unittest.TestCase):
                     self.__class__.binance_com_testnet_api_key,
                     self.__class__.binance_com_testnet_api_secret,
                 ),
-                r"wss://testnet.binance.vision/ws-api/v3",
+                r"wss://ws-api.testnet.binance.vision/ws-api/v3",
             )
 
     def test_create_uri_userdata_reverse_com(self):
@@ -514,7 +514,7 @@ class TestBinanceComManagerTest(unittest.TestCase):
                     self.binance_com_testnet_api_key,
                     self.binance_com_testnet_api_secret,
                 ),
-                r"wss://testnet.binance.vision/ws-api/v3",
+                r"wss://ws-api.testnet.binance.vision/ws-api/v3",
             )
 
     def test_is_exchange_type_cex(self):
