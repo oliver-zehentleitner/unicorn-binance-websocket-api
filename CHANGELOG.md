@@ -14,10 +14,16 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - Testnet WebSocket API base URL: Binance moved the Spot/Margin/Isolated-
   Margin testnet WS-API endpoint to a dedicated `ws-api.` subdomain
   (`wss://ws-api.testnet.binance.vision/ws-api/v3`, was
-  `wss://testnet.binance.vision/ws-api/v3`). The general stream endpoint and
-  the Futures testnet WS-API are unaffected.
+  `wss://testnet.binance.vision/ws-api/v3`). The Futures testnet WS-API is
+  unaffected.
   ([issue #459](https://github.com/oliver-zehentleitner/unicorn-binance-websocket-api/issues/459),
   [PR #460](https://github.com/oliver-zehentleitner/unicorn-binance-websocket-api/pull/460))
+- Testnet WebSocket stream base URL: Binance also moved the Spot/Margin/
+  Isolated-Margin testnet market data stream endpoint to the `stream.`
+  subdomain (`wss://stream.testnet.binance.vision/`, was
+  `wss://testnet.binance.vision/`, which now 404s). Confirmed via a live
+  WebSocket handshake against both hosts.
+  ([issue #459](https://github.com/oliver-zehentleitner/unicorn-binance-websocket-api/issues/459))
 
 ## 2.15.0
 ### Added

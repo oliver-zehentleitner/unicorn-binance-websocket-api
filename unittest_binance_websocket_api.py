@@ -436,25 +436,25 @@ class TestBinanceComManagerTest(unittest.TestCase):
     def test_create_uri_miniticker_regular_com(self):
         self.assertEqual(
             self.__class__.ubwa.create_websocket_uri(["!miniTicker"], ["arr"]),
-            "wss://testnet.binance.vision/ws/!miniTicker@arr",
+            "wss://stream.testnet.binance.vision/ws/!miniTicker@arr",
         )
 
     def test_create_uri_miniticker_reverse_com(self):
         self.assertEqual(
             self.__class__.ubwa.create_websocket_uri(["arr"], ["!miniTicker"]),
-            "wss://testnet.binance.vision/ws/!miniTicker@arr",
+            "wss://stream.testnet.binance.vision/ws/!miniTicker@arr",
         )
 
     def test_create_uri_ticker_regular_com(self):
         self.assertEqual(
             self.__class__.ubwa.create_websocket_uri(["!ticker"], ["arr"]),
-            "wss://testnet.binance.vision/ws/!ticker@arr",
+            "wss://stream.testnet.binance.vision/ws/!ticker@arr",
         )
 
     def test_create_uri_ticker_reverse_com(self):
         self.assertEqual(
             self.__class__.ubwa.create_websocket_uri(["arr"], ["!ticker"]),
-            "wss://testnet.binance.vision/ws/!ticker@arr",
+            "wss://stream.testnet.binance.vision/ws/!ticker@arr",
         )
 
     def test_create_uri_userdata_regular_false_com(self):
