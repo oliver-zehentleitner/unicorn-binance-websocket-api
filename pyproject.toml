@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "unicorn-binance-websocket-api"
-version = "2.15.0"
+version = "2.15.1"
 description = "A Python SDK to use the Binance Websocket API`s (com+testnet, com-margin+testnet, com-isolated_margin+testnet, com-futures+testnet, com-coin_futures, us, tr, dex/chain+testnet) in a simple, fast, flexible, robust and fully-featured way."
 authors = ["Oliver Zehentleitner"]
 license = "MIT"

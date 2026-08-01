@@ -515,10 +515,10 @@ Run in bash:
 `pip install https://github.com/oliver-zehentleitner/unicorn-binance-websocket-api/archive/$(curl -s https://api.github.com/repos/oliver-zehentleitner/unicorn-binance-websocket-api/releases/latest | grep -oP '"tag_name": "\K(.*)(?=")').tar.gz --upgrade`
 
 #### Windows
-Use the below command with the version (such as 2.15.0) you determined 
+Use the below command with the version (such as 2.15.1) you determined 
 [here](https://github.com/oliver-zehentleitner/unicorn-binance-websocket-api/releases/latest):
 
-`pip install https://github.com/oliver-zehentleitner/unicorn-binance-websocket-api/archive/2.15.0.tar.gz --upgrade`
+`pip install https://github.com/oliver-zehentleitner/unicorn-binance-websocket-api/archive/2.15.1.tar.gz --upgrade`
 ### From the latest source (dev-stage) with PIP from [GitHub](https://github.com/oliver-zehentleitner/unicorn-binance-websocket-api)
 This is not a release version and can not be considered to be stable!
 

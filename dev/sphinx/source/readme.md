@@ -6,6 +6,7 @@
 [![Conda-Forge Downloads](https://img.shields.io/conda/dn/conda-forge/unicorn-binance-websocket-api?color=blue&label=downloads)](https://anaconda.org/conda-forge/unicorn-binance-websocket-api)
 [![License](https://img.shields.io/github/license/oliver-zehentleitner/unicorn-binance-websocket-api.svg?color=blue)](https://oliver-zehentleitner.github.io/unicorn-binance-websocket-api/license.html)
 [![Supported Python Version](https://img.shields.io/pypi/pyversions/unicorn_binance_websocket_api.svg)](https://www.python.org/downloads/)
+[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 [![PyPI - Status](https://img.shields.io/pypi/status/unicorn_binance_websocket_api.svg)](https://github.com/oliver-zehentleitner/unicorn-binance-websocket-api/issues)
 [![codecov](https://codecov.io/gh/oliver-zehentleitner/unicorn-binance-websocket-api/branch/master/graph/badge.svg?token=5I03AZ3F5S)](https://codecov.io/gh/oliver-zehentleitner/unicorn-binance-websocket-api)
 [![CodeQL](https://github.com/oliver-zehentleitner/unicorn-binance-websocket-api/actions/workflows/codeql-analysis.yml/badge.svg)](https://github.com/oliver-zehentleitner/unicorn-binance-websocket-api/actions/workflows/codeql-analysis.yml)
@@ -514,10 +515,10 @@ Run in bash:
 `pip install https://github.com/oliver-zehentleitner/unicorn-binance-websocket-api/archive/$(curl -s https://api.github.com/repos/oliver-zehentleitner/unicorn-binance-websocket-api/releases/latest | grep -oP '"tag_name": "\K(.*)(?=")').tar.gz --upgrade`
 
 #### Windows
-Use the below command with the version (such as 2.15.0) you determined 
+Use the below command with the version (such as 2.15.1) you determined 
 [here](https://github.com/oliver-zehentleitner/unicorn-binance-websocket-api/releases/latest):
 
-`pip install https://github.com/oliver-zehentleitner/unicorn-binance-websocket-api/archive/2.15.0.tar.gz --upgrade`
+`pip install https://github.com/oliver-zehentleitner/unicorn-binance-websocket-api/archive/2.15.1.tar.gz --upgrade`
 ### From the latest source (dev-stage) with PIP from [GitHub](https://github.com/oliver-zehentleitner/unicorn-binance-websocket-api)
 This is not a release version and can not be considered to be stable!
 

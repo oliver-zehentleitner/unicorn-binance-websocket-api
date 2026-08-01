@@ -1,2 +1,2 @@
-2.15.0
+2.15.1
 meta.yaml,pyproject.toml,setup.py,README.md,.github/workflows/build_wheels.yml,dev/sphinx/source/conf.py,unicorn_binance_websocket_api/manager.py,AGENTS.md

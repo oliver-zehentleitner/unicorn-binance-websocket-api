@@ -78,7 +78,7 @@ import orjson
 import websockets
 
 __app_name__: str = "unicorn-binance-websocket-api"
-__version__: str = "2.15.0.dev"
+__version__: str = "2.15.1"
 __logger__: logging.getLogger = logging.getLogger("unicorn_binance_websocket_api")
 
 logger = __logger__
