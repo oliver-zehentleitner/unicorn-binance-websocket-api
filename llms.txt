@@ -7,7 +7,7 @@
 
 Beginner-friendly despite depth — complexity is optional, the API stays clean and Pythonic.
 
-Version: 2.13.0. Python 3.9 – 3.14.
+Version: 2.15.1. Python 3.9 – 3.14.
 
 ## Authorship & License
 
