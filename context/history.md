@@ -2,6 +2,7 @@
 
 ## Repo origin: LUCIT-Systems-and-Development
 
+**Type:** decision
 **Status:** superseded — repo now lives under `oliver-zehentleitner`
 **Evidence:** confirmed
 **Source:** git history; earliest commits reference `github.com/LUCIT-Systems-and-Development/unicorn-binance-websocket-api`
@@ -14,6 +15,7 @@ The repo was previously hosted under the `LUCIT-Systems-and-Development` GitHub 
 
 ## Icinga/monitoring REST server removed, not just rebranded
 
+**Type:** decision
 **Status:** active
 **Evidence:** confirmed
 **Source:** commit `ee615105`
@@ -26,6 +28,7 @@ The repo was previously hosted under the `LUCIT-Systems-and-Development` GitHub 
 
 ## Hardcoded LUCIT org URL broke `get_latest_release_info()`
 
+**Type:** incident
 **Status:** superseded — fixed
 **Evidence:** confirmed
 **Source:** commit `c2eb03ac`
