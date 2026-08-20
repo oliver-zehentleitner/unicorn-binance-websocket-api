@@ -2,6 +2,7 @@
 
 ## Scoped to listenKey/user-data only, no market-data or WS API support
 
+**Type:** constraint
 **Status:** active
 **Evidence:** confirmed
 **Source:** issue [#452](https://github.com/oliver-zehentleitner/unicorn-binance-websocket-api/issues/452), commit `b53277f2`
@@ -12,6 +13,7 @@
 
 ## Deliberately outside `BINANCE_FUTURES_EXCHANGES`
 
+**Type:** decision
 **Status:** active
 **Evidence:** confirmed
 **Source:** commit `b53277f2`: "deliberately outside BINANCE_FUTURES_EXCHANGES"
@@ -22,6 +24,7 @@
 
 ## Follow-up: graceful degradation for the not-yet-released dependency
 
+**Type:** workaround
 **Status:** active
 **Evidence:** confirmed
 **Source:** commit `f44ee416`, found during self-review of PR #453
