@@ -105,7 +105,7 @@ jobs:
           generate_release_notes: true
           name: unicorn-binance-websocket-api
           prerelease: false
-          tag_name: 2.15.1
+          tag_name: 2.15.2
           token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Create PyPi Release

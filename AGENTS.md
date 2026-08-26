@@ -17,7 +17,7 @@ Open development tasks and decisions are tracked in **[TASKS.md](TASKS.md)**.
 
 Python SDK (MIT License) for connecting to Binance WebSocket streams. Enables multiplexed WebSocket connections, automatic buffering, reconnect handling, and WebSocket API calls (e.g. order placement).
 
-**Current Version:** 2.15.1  
+**Current Version:** 2.15.2  
 **Python Compatibility:** 3.9 – 3.14  
 **Author:** Oliver Zehentleitner  
 **PyPI:** `unicorn-binance-websocket-api`

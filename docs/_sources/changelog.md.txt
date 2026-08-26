@@ -9,7 +9,17 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
   [How to upgrade to the latest version!](https://oliver-zehentleitner.github.io/unicorn-binance-websocket-api/readme.html#installation-and-upgrade)
 
-## 2.15.1.dev (development stage/unreleased/unstable)
+## 2.15.2.dev (development stage/unreleased/unstable)
+
+## 2.15.2
+### Fixed
+- SOCKS5 proxy connections used `websocket_base_uri` to determine the proxy
+  target host, instead of the actual stream URI. This was wrong for
+  WebSocket API streams and the WS API userData subscription flow, which
+  connect to `websocket_api_base_uri` — a different host
+  (e.g. `ws-api.binance.com` vs. `stream.binance.com`). Any SOCKS5 proxy
+  user with such a stream had the proxy tunnel opened to the wrong host.
+  ([issue #467](https://github.com/oliver-zehentleitner/unicorn-binance-websocket-api/issues/467))
 
 ## 2.15.1
 ### Fixed
