@@ -162,7 +162,10 @@ class BinanceWebSocketApiConnection(object):
                 username=self.manager.socks5_proxy_user,
                 password=self.manager.socks5_proxy_pass,
             )
-            netloc = urlparse(self.manager.websocket_base_uri).netloc
+            # Use the actual stream URI, not `websocket_base_uri`: for WebSocket API
+            # streams and the WS API userData subscription flow, `uri` resolves to
+            # `websocket_api_base_uri`, a different host (see connection_settings.py).
+            netloc = urlparse(str(uri)).netloc
             try:
                 host, port = netloc.split(":")
             except ValueError as error_msg:
