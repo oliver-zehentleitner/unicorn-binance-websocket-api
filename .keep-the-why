@@ -1,0 +1,12 @@
+This is machine-readable project state for the Keep the Why skill
+(https://keepthewhy.com). See context/index.md, or this project's own
+README, for what Keep the Why actually is.
+
+<!-- keep-the-why:config -->
+- id: oliver-zehentleitner---unicorn-binance-websocket-api
+- context: `context/`
+- init: complete
+- context-schema: 0.11.0
+- capture-confirmation: confirm-when-unsure
+- source-reference: never
+<!-- /keep-the-why:config -->

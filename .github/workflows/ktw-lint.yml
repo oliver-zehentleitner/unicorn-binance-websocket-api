@@ -1,0 +1,17 @@
+name: ktw-lint
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+
+jobs:
+  ktw-lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oliver-zehentleitner/keep-the-why@lint-latest   # or @lint-v<version> to pin the action
+        with:
+          path: "."
+          strict: "false"    # "true" turns warnings (e.g. missing Type on old entries) into failures
+          # version: "0.11.0.0"   # optional: pin the linter itself; @lint-v<version> above pins only the wrapper

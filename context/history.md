@@ -2,8 +2,10 @@
 
 ## Repo origin: LUCIT-Systems-and-Development
 
+> Superseded — repo now lives under `oliver-zehentleitner`.
+
 **Type:** decision
-**Status:** superseded — repo now lives under `oliver-zehentleitner`
+**Status:** superseded
 **Evidence:** confirmed
 **Source:** git history; earliest commits reference `github.com/LUCIT-Systems-and-Development/unicorn-binance-websocket-api`
 
@@ -28,8 +30,10 @@ The repo was previously hosted under the `LUCIT-Systems-and-Development` GitHub 
 
 ## Hardcoded LUCIT org URL broke `get_latest_release_info()`
 
+> Superseded — fixed.
+
 **Type:** incident
-**Status:** superseded — fixed
+**Status:** superseded
 **Evidence:** confirmed
 **Source:** commit `c2eb03ac`
 
