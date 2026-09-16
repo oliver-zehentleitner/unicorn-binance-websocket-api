@@ -62,7 +62,7 @@
 
 ## S
 
-- [stream-loop.md](stream-loop.md) — untimed `recv()` after the first receives (deliberate, `wait_for` overhead; stop latency on idle streams accepted) and the profiled ~5 µs per message UBWA used to add (debug f-strings, locks, duplicate checks), the ablation, and the hot-path slim-down that removed most of it
+- [stream-loop.md](stream-loop.md) — untimed `recv()` after the first receives (deliberate, `wait_for` overhead; stop latency on idle streams accepted) and the profiled ~5 µs per message UBWA used to add (debug f-strings, locks, duplicate checks), the ablation, and the hot-path slim-down that removed most of it, and why endpoint responses are detected in the first 256 characters instead of by scanning the whole payload
 
 ## T
 

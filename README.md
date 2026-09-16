@@ -550,23 +550,23 @@ Background, benchmarks and the 24 h soak in the article
 #### Is `picows` faster? Measured, not assumed
 `dev/test_websocket_library_benchmark.py` replays Binance shaped messages from a local server (separate process)
 through the complete UBWA stack (connection → stream loop → `process_stream_data` callback), 3 runs, median.
-Python 3.13, websockets 16.0, picows 2.1.3, x86_64 Linux, `output_default="raw_data"`:
+Python 3.13, websockets 16.0, picows 2.3.0, x86_64 Linux (8 cores), `output_default="raw_data"`:
 
 | Scenario | ~msg size | msgs | websockets msgs/s | picows msgs/s | picows speedup | websockets CPU µs/msg | picows CPU µs/msg |
 |---|---|---|---|---|---|---|---|
-| small_aggtrade | 0.2 KB | 300,000 | 201,912 | 403,316 | 2.00x | 5.1 | 2.5 |
-| medium_kline | 0.3 KB | 150,000 | 195,460 | 371,019 | 1.90x | 5.2 | 2.9 |
-| large_depth20 | 1.0 KB | 60,000 | 153,187 | 259,960 | 1.70x | 6.8 | 4.1 |
-| xlarge_depth_diff | 9.1 KB | 30,000 | 64,172 | 67,972 | 1.06x | 16.3 | 15.4 |
-| huge_ticker_arr | 453.9 KB | 600 | 1,768 | 1,662 | 0.94x | 608.7 | 641.0 |
-| multiplex_mix | 0.2 KB | 120,000 | 180,406 | 334,188 | 1.85x | 5.7 | 3.2 |
+| small_aggtrade | 0.2 KB | 300,000 | 199,732 | 380,421 | 1.90x | 5.1 | 2.7 |
+| medium_kline | 0.3 KB | 150,000 | 197,460 | 369,367 | 1.87x | 5.3 | 2.9 |
+| large_depth20 | 1.0 KB | 60,000 | 167,888 | 315,078 | 1.88x | 6.5 | 3.6 |
+| xlarge_depth_diff | 9.1 KB | 30,000 | 100,373 | 117,231 | 1.17x | 10.9 | 9.4 |
+| huge_ticker_arr | 453.9 KB | 600 | 4,540 | 3,904 | 0.86x | 281.5 | 318.5 |
+| multiplex_mix | 0.2 KB | 120,000 | 184,102 | 347,272 | 1.89x | 5.7 | 3.0 |
 
 - Up to ~1 KB per message (aggTrade, kline, bookTicker, depth20, ...) picows delivers **1.7x-2x** the throughput at
-  about half the CPU per message. From ~10 KB upwards (full `depth` diffs, `!ticker@arr`) both are on par, and on
-  the 450 KB `!ticker@arr` payload picows is a few percent behind. That row is an artifact of the local replay
-  (a loopback firehose feeding a consumer that is slower than the wire, so picows drains a multi-MB socket buffer
-  in one read): driven directly picows wins at every size, and with `--rcvbuf 131072` (client socket receive
-  buffer capped, closer to a WAN link) it is 1.3x-1.4x ahead at 450 KB through UBWA as well. Details in
+  about half the CPU per message. At 9 KB (full `depth` diffs) picows is 1.2x ahead, and on the 450 KB
+  `!ticker@arr` payload it is behind. That row is an artifact of the local replay (a loopback firehose feeding a
+  consumer that is slower than the wire, so picows drains a multi-MB socket buffer in one read): driven directly
+  picows wins at every size, and with `--rcvbuf 131072` (client socket receive buffer capped, closer to a WAN
+  link) it is 1.4x-1.55x ahead through UBWA as well. Details in
   [`context/websocket-library.md`](https://github.com/oliver-zehentleitner/unicorn-binance-websocket-api/blob/master/context/websocket-library.md).
 - With `output_default="dict"` (orjson parsing included) the gap is 1.4x-1.7x for messages up to 1 KB.
 - Against live binance.com with a 20 symbol multiplex (a few hundred msgs/s) the choice makes no measurable

@@ -449,6 +449,11 @@ big-message part):**
   thread, monitoring threads on the same GIL) amplifies it. Irrelevant for
   live Binance traffic: a WAN link at a few MB/s never fills the socket
   buffer like that, and the 24 h soak showed picows with less CPU and RSS.
+  Follow-up: the two full-text scans were replaced by a head-only check
+  (`stream-loop.md`, "Endpoint responses are detected in the first 256
+  characters"), which halves UBWA's cost per 454 KB message for both
+  libraries; the replay artifact itself remains (consumer still slower than
+  loopback), `--rcvbuf 131072` shows picows 1.55x there.
 - Before the stream-loop optimization UBWA added a constant ~5 µs per
   message on top of either library (3.1 -> 8.7 µs for websockets,
   2.0 -> 6.2 µs for picows). After it (`stream-loop.md`) the overhead is

@@ -1843,6 +1843,20 @@ class _LocalWebSocketServer:
     async def _scenario_unicode(self, ws, connection_number):
         await ws.send('{"stream":"unicode@trade","data":{"e":"trade","s":"€ÜŸ–日本"}}')
 
+    async def _scenario_markers(self, ws, connection_number):
+        # A ~400 KB data message whose payload contains the words "error" and
+        # "result" far behind the JSON head must reach the callback as data,
+        # not the error/result ringbuffers; a genuine endpoint error must.
+        items = ",".join(
+            f'{{"s":"SYM{i:04d}","c":"{i}.0"'
+            + (',"note":"result of error"' if i >= 100 else "")
+            + "}"
+            for i in range(10000)
+        )
+        await ws.send(f'{{"stream":"markers@trade","data":[{items}]}}')
+        await ws.send(self._trade("markers", 0))
+        await ws.send('{"error":{"code":2,"msg":"Invalid request"},"id":424242}')
+
     async def _scenario_bytes(self, ws, connection_number):
         for i in range(3):
             await ws.send(self._trade("bytes", i) + " " * (100 * i))
@@ -2160,6 +2174,46 @@ class TestWebSocketLibrary(unittest.TestCase):
                         )
                     )
                     self.assertEqual(ubwa.get_stream_info(stream_id)["reconnects"], 0)
+                finally:
+                    ubwa.stop_manager()
+
+    def test_response_markers_scanned_in_head_only(self):
+        print(f"test_response_markers_scanned_in_head_only():")
+        for library in self.libraries:
+            with self.subTest(library=library):
+                received = []
+                ubwa = self._manager(library, process_stream_data=received.append)
+                try:
+                    ubwa.create_stream(["trade"], ["markers"])
+                    self.assertTrue(
+                        self._wait_for(lambda: len(self._trades(received)) >= 2)
+                    )
+                    self.assertTrue(
+                        self._wait_for(
+                            lambda: any(
+                                "424242" in error
+                                for error in ubwa.get_errors_from_endpoints()
+                            ),
+                            10,
+                        )
+                    )
+                    # the big data message arrived as data ...
+                    big = [
+                        t for t in self._trades(received) if isinstance(t["data"], list)
+                    ]
+                    self.assertEqual(len(big), 1)
+                    self.assertEqual(len(big[0]["data"]), 10000)
+                    # ... and not as a result or error of the endpoint
+                    self.assertFalse(
+                        any("SYM0000" in r for r in ubwa.get_results_from_endpoints())
+                    )
+                    self.assertFalse(
+                        any("SYM0000" in e for e in ubwa.get_errors_from_endpoints())
+                    )
+                    # the subscribe acknowledgment is still classified as result
+                    self.assertTrue(
+                        any('"result"' in r for r in ubwa.get_results_from_endpoints())
+                    )
                 finally:
                     ubwa.stop_manager()
 

@@ -11,6 +11,12 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ## 2.16.0.dev (development stage/unreleased/unstable)
 ### Changed
+- Stream loop: endpoint responses (`result`, `error`, WS API request ids) are
+  now detected in the first 256 characters of a received message instead of
+  by scanning the whole payload. Big messages (`!ticker@arr`, full `depth`
+  diffs) no longer pay two full-text scans per message, and a data payload
+  that happens to contain the word `error` or `result` is no longer copied
+  into the error/result ringbuffers. `RESPONSE_SCAN_CHARS` in `sockets.py`.
 - `dev/test_websocket_library_benchmark.py`: new `--rcvbuf BYTES` option that
   caps `SO_RCVBUF` on the client socket (both libraries) and a docstring on
   why picows looks slower than websockets on big messages in the default

@@ -116,3 +116,59 @@ event or an error stay.
 `processed_receives_total` or the per-second dicts is introduced - then the
 lock-free increments in `set_heartbeat()`, `increase_received_bytes_per_second()`
 and `increase_processed_receives_statistic()` need the lock back.
+
+## Endpoint responses are detected in the first 256 characters, not by scanning the payload
+
+**Type:** decision
+**Status:** active
+**Evidence:** confirmed
+**Source:** big-message re-measurement 2026-09-16 (`websocket-library.md`, "Benchmark results"); `dev/test_websocket_library_benchmark.py` before/after on the same machine (8 cores, websockets 16.0, picows 2.3.0), median of 3; `RESPONSE_SCAN_CHARS` in `sockets.py`; unit test `test_response_markers_scanned_in_head_only`
+**Revisit when:** Binance changes a response envelope so that `result`, `error` or the request id can sit beyond the first 256 characters (a new leading field with variable-length content)
+
+Every received message used to be scanned twice in full, `"error" in msg`
+and `"result" in msg`, to route endpoint responses into the error/result
+ringbuffers; in WS API mode the pending request ids were searched the same
+way. On a 454 KB `!ticker@arr` message those scans were ~315 µs of the
+~600 µs UBWA spent per message - more than receiving and decoding it - and
+they were what made UBWA slower than the loopback wire in the replay
+benchmark (the trigger of the picows big-message artifact). Now the checks
+run on `msg[:RESPONSE_SCAN_CHARS]` (256).
+
+**Reason 256 is enough:** the markers are in the JSON head by construction.
+Stream endpoint: `{"result":null,"id":N}`, `{"error":{...},"id":N}`. WS
+API: `{"id":"<uuid, 36 chars>","status":NNN,"result"|"error":...}` puts the
+marker at ~55 characters; `rateLimits` follows the result. 256 leaves
+headroom for longer ids and whitespace. A data message (`{"stream":...`,
+`{"e":...`) never carries these keys in its head.
+
+**Also a correctness fix:** a data payload that contained the word `error`
+or `result` anywhere (a symbol note, a text field) was copied into the
+ringbuffers on top of being delivered - the new unit test sends such a
+payload and fails on the previous code.
+
+**Rejected alternatives:**
+
+- Parse every message with `orjson` and look at the keys: costs a full parse
+  in `raw_data` mode where none is otherwise needed, on the same order as
+  the scans it would replace.
+- Exact `startswith()` checks (`{"result"`, `{"error"`, `{"id"`): brittle
+  against field order and whitespace in the envelopes, and the WS API
+  envelope starts with `id`, not with the marker.
+- Leave it: the scans were the dominant per-message cost for anything above
+  ~10 KB, see the table.
+
+**Before/after, through the full stack, `raw_data`, median of 3:**
+
+| Scenario | ~msg size | websockets msgs/s before -> after | picows msgs/s before -> after | websockets CPU µs/msg | picows CPU µs/msg |
+|---|---|---|---|---|---|
+| small_aggtrade | 0.2 KB | 199,903 -> 199,732 | 389,817 -> 380,421 | 5.1 -> 5.1 | 2.7 -> 2.7 |
+| large_depth20 | 1.0 KB | 156,952 -> 167,888 | 277,895 -> 315,078 | 6.9 -> 6.5 | 4.0 -> 3.6 |
+| xlarge_depth_diff | 9.1 KB | 66,368 -> 100,373 | 67,336 -> 117,231 | 16.0 -> 10.9 | 15.7 -> 9.4 |
+| huge_ticker_arr | 453.9 KB | 1,810 -> 4,540 | 1,690 -> 3,904 | 625.5 -> 281.5 | 678.7 -> 318.5 |
+
+`dict` mode, 454 KB: websockets 391 -> 468 msgs/s, picows 427 -> 522. Small
+messages are unchanged (the slice of a 200-byte string is noise). In the
+loopback firehose replay picows still trails websockets at 454 KB in
+`raw_data` mode (0.86x) because the consumer is still slower than the wire
+there; with `--rcvbuf 131072` the same scenario is picows 1.55x (5,218 vs
+3,375 msgs/s, 213 vs 334 µs) and 9 KB is 1.41x.

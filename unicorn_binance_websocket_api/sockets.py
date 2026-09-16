@@ -50,6 +50,14 @@ __logger__: logging.getLogger = logging.getLogger("unicorn_binance_websocket_api
 logger = __logger__
 
 
+# Endpoint responses (`{"result":...,"id":...}`, `{"error":...}`, WS API
+# `{"id":...,"status":...,"result"|"error":...}`) carry their markers in the
+# first few dozen characters. Scanning only this many characters instead of
+# the whole payload keeps the classification of a 450 KB `!ticker@arr`
+# message from costing more than receiving it. See context/stream-loop.md.
+RESPONSE_SCAN_CHARS = 256
+
+
 class BinanceWebSocketApiSocket(object):
     def __init__(self, manager, stream_id, channels, markets):
         self.manager = manager
@@ -189,6 +197,12 @@ class BinanceWebSocketApiSocket(object):
 
                         received_stream_data_json = await self.websocket.receive()
                         if received_stream_data_json is not None:
+                            # Response markers (`result`, `error`, request ids)
+                            # sit at the start of the JSON; the data payload
+                            # behind them is never scanned.
+                            response_head = received_stream_data_json[
+                                :RESPONSE_SCAN_CHARS
+                            ]
                             # Filter the userDataStream.subscribe.signature acknowledgment so it does
                             # not reach the user's callback/stream_buffer. On auth failure, crash the
                             # stream with a meaningful error instead of silently dropping events.
@@ -310,7 +324,7 @@ class BinanceWebSocketApiSocket(object):
                                 return_response_by_request_id = None
                                 with self.manager.return_response_lock:
                                     for request_id in self.manager.return_response:
-                                        if request_id in received_stream_data_json:
+                                        if request_id in response_head:
                                             return_response_by_request_id = request_id
                                             break
                                 if return_response_by_request_id is not None:
@@ -324,7 +338,7 @@ class BinanceWebSocketApiSocket(object):
                                 process_by_request_id = None
                                 with self.manager.process_response_lock:
                                     for request_id in self.manager.process_response:
-                                        if request_id in received_stream_data_json:
+                                        if request_id in response_head:
                                             process_by_request_id = request_id
                                             break
                                 if process_by_request_id is not None:
@@ -400,7 +414,7 @@ class BinanceWebSocketApiSocket(object):
                                         received_stream_data
                                     )
 
-                            if "error" in received_stream_data_json:
+                            if "error" in response_head:
                                 logger.error(
                                     "BinanceWebSocketApiSocket.start_socket("
                                     + str(self.stream_id)
@@ -411,7 +425,7 @@ class BinanceWebSocketApiSocket(object):
                                 self.manager.add_to_ringbuffer_error(
                                     received_stream_data_json
                                 )
-                            elif "result" in received_stream_data_json:
+                            elif "result" in response_head:
                                 logger.debug(
                                     "BinanceWebSocketApiSocket.start_socket("
                                     + str(self.stream_id)
