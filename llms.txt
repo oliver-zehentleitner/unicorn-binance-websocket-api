@@ -143,7 +143,7 @@ stream2 = ubwa.create_stream(channels="!userData", markets="arr",
 | high_performance | bool | False | Disable internal logging for speed |
 | proxy | str | None | Proxy URL passed to the WebSocket library: http://, https://, socks4://, socks5://[user:pass@]host:port; ValueError on unsupported scheme |
 | socks5_proxy_server | str | None | Legacy SOCKS5 form 'address:port' (+ socks5_proxy_user/pass), not combinable with proxy |
-| websocket_library | str | "websockets" | WebSocket client library: "websockets" or "picows" (optional extra `pip install unicorn-binance-websocket-api[picows]`, fails loud if missing; picows ~1.4x+ throughput for messages up to ~1 KB, see https://github.com/oliver-zehentleitner/unicorn-binance-websocket-api/issues/477) |
+| websocket_library | str | "websockets" | WebSocket client library: "websockets" or "picows" (optional extra `pip install unicorn-binance-websocket-api[picows]`, fails loud if missing; picows ~1.9x throughput and ~half the CPU per message for messages up to ~1 KB with `output_default="raw_data"`, ~1.4x-1.75x with `"dict"` (UBWA 2.16.1), see https://github.com/oliver-zehentleitner/unicorn-binance-websocket-api/issues/477) |
 
 ### create_stream()
 | Parameter | Type | Default | Purpose |

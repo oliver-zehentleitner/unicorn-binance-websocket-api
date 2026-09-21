@@ -550,7 +550,7 @@ Background, benchmarks and the 24 h soak in the article
 #### Is `picows` faster? Measured, not assumed
 `dev/test_websocket_library_benchmark.py` replays Binance shaped messages from a local server (separate process)
 through the complete UBWA stack (connection → stream loop → `process_stream_data` callback), 3 runs, median.
-Python 3.13, websockets 16.0, picows 2.3.0, x86_64 Linux (8 cores), `output_default="raw_data"`:
+UBWA 2.16.1, Python 3.13, websockets 16.0, picows 2.3.0, x86_64 Linux (8 cores), `output_default="raw_data"`:
 
 | Scenario | ~msg size | msgs | websockets msgs/s | picows msgs/s | picows speedup | websockets CPU µs/msg | picows CPU µs/msg |
 |---|---|---|---|---|---|---|---|
@@ -568,7 +568,9 @@ Python 3.13, websockets 16.0, picows 2.3.0, x86_64 Linux (8 cores), `output_defa
   picows wins at every size, and with `--rcvbuf 131072` (client socket receive buffer capped, closer to a WAN
   link) it is 1.4x-1.55x ahead through UBWA as well. Details in
   [`context/websocket-library.md`](https://github.com/oliver-zehentleitner/unicorn-binance-websocket-api/blob/master/context/websocket-library.md).
-- With `output_default="dict"` (orjson parsing included) the gap is 1.4x-1.7x for messages up to 1 KB.
+- With `output_default="dict"` (orjson parsing included) the gap is 1.4x-1.75x for messages up to 1 KB
+  (aggTrade 160k vs. 281k msgs/s, depth20 114k vs. 161k), parity at 9 KB and 1.16x at 450 KB - the JSON parse
+  dominates there.
 - Against live binance.com with a 20 symbol multiplex (a few hundred msgs/s) the choice makes no measurable
   difference: the CPU load is dominated by UBWA's fixed per-manager overhead, not by the transport.
 - So: pick `picows` for high-throughput consumers (many streams, `depth@100ms` on hundreds of symbols, CPU-bound
