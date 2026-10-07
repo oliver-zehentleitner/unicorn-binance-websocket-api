@@ -10,6 +10,24 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
   [How to upgrade to the latest version!](https://oliver-zehentleitner.github.io/unicorn-binance-websocket-api/readme.html#installation-and-upgrade)
 
 ## 2.16.1.dev (development stage/unreleased/unstable)
+### Added
+- `BinanceWebSocketApiManager(ws_api_response_timeout=30.0)`: seconds a
+  WebSocket API request with `return_response=True` waits for its response.
+  `None` restores waiting without limit.
+- `WebSocketApiResponseTimeout` exception (a `TimeoutError`), raised when that
+  timeout expires.
+### Changed
+- `get_stream_info()` (and with it `get_stream_list()`) returns `api_key` and
+  `api_secret` masked (first 4 and last 2 characters, the rest `*`), the same
+  way UBDCC shows key previews. The stream keeps the real keys for signing.
+### Fixed
+- WebSocket API requests with `return_response=True` waited forever when no
+  response arrived (dropped connection, lost message). They now raise
+  `WebSocketApiResponseTimeout` after `ws_api_response_timeout` seconds.
+- The response waiter (`return_response`) and callback (`process_response`) of
+  a WebSocket API request were registered after the request was sent, so a
+  fast response could arrive before them and not be matched. Both are
+  registered before sending now.
 
 ## 2.16.1
 ### Changed

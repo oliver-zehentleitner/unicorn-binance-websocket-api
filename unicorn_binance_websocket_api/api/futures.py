@@ -41,7 +41,6 @@
 from decimal import Decimal
 from typing import Optional, Union, Literal
 import logging
-import threading
 
 __logger__: logging.getLogger = logging.getLogger("unicorn_binance_websocket_api")
 
@@ -240,27 +239,23 @@ class BinanceWebSocketApiApiFutures(object):
             f"BinanceWebSocketApiApiFutures.cancel_order() - Create payload: {payload}"
         )
 
+        if process_response is not None:
+            with self._manager.process_response_lock:
+                entry = {"callback_function": process_response}
+                self._manager.process_response[request_id] = entry
+        if return_response is True:
+            self._manager._add_return_response_waiter(request_id=request_id)
+
         if (
             self._manager.send_with_stream(stream_id=stream_id, payload=payload)
             is False
         ):
             self._manager.add_payload_to_stream(stream_id=stream_id, payload=payload)
 
-        if process_response is not None:
-            with self._manager.process_response_lock:
-                entry = {"callback_function": process_response}
-                self._manager.process_response[request_id] = entry
-
         if return_response is True:
-            with self._manager.return_response_lock:
-                entry = {"event_return_response": threading.Event()}
-                self._manager.return_response[request_id] = entry
-            self._manager.return_response[request_id]["event_return_response"].wait()
-            with self._manager.return_response_lock:
-                response_value = self._manager.return_response[request_id][
-                    "response_value"
-                ]
-                del self._manager.return_response[request_id]
+            response_value = self._manager._wait_for_return_response(
+                request_id=request_id
+            )
             return response_value
 
         return True
@@ -600,27 +595,23 @@ class BinanceWebSocketApiApiFutures(object):
             f"BinanceWebSocketApiApiFutures.create_order() - Create payload: {payload}"
         )
 
+        if process_response is not None:
+            with self._manager.process_response_lock:
+                entry = {"callback_function": process_response}
+                self._manager.process_response[request_id] = entry
+        if return_response is True:
+            self._manager._add_return_response_waiter(request_id=request_id)
+
         if (
             self._manager.send_with_stream(stream_id=stream_id, payload=payload)
             is False
         ):
             self._manager.add_payload_to_stream(stream_id=stream_id, payload=payload)
 
-        if process_response is not None:
-            with self._manager.process_response_lock:
-                entry = {"callback_function": process_response}
-                self._manager.process_response[request_id] = entry
-
         if return_response is True:
-            with self._manager.return_response_lock:
-                entry = {"event_return_response": threading.Event()}
-                self._manager.return_response[request_id] = entry
-            self._manager.return_response[request_id]["event_return_response"].wait()
-            with self._manager.return_response_lock:
-                response_value = self._manager.return_response[request_id][
-                    "response_value"
-                ]
-                del self._manager.return_response[request_id]
+            response_value = self._manager._wait_for_return_response(
+                request_id=request_id
+            )
             return new_client_order_id, response_value
 
         return new_client_order_id
@@ -754,27 +745,23 @@ class BinanceWebSocketApiApiFutures(object):
             f"BinanceWebSocketApiApiFutures.get_account_balance() - Created payload: {payload}"
         )
 
+        if process_response is not None:
+            with self._manager.process_response_lock:
+                entry = {"callback_function": process_response}
+                self._manager.process_response[request_id] = entry
+        if return_response is True:
+            self._manager._add_return_response_waiter(request_id=request_id)
+
         if (
             self._manager.send_with_stream(stream_id=stream_id, payload=payload)
             is False
         ):
             self._manager.add_payload_to_stream(stream_id=stream_id, payload=payload)
 
-        if process_response is not None:
-            with self._manager.process_response_lock:
-                entry = {"callback_function": process_response}
-                self._manager.process_response[request_id] = entry
-
         if return_response is True:
-            with self._manager.return_response_lock:
-                entry = {"event_return_response": threading.Event()}
-                self._manager.return_response[request_id] = entry
-            self._manager.return_response[request_id]["event_return_response"].wait()
-            with self._manager.return_response_lock:
-                response_value = self._manager.return_response[request_id][
-                    "response_value"
-                ]
-                del self._manager.return_response[request_id]
+            response_value = self._manager._wait_for_return_response(
+                request_id=request_id
+            )
             return response_value
 
         return True
@@ -977,27 +964,23 @@ class BinanceWebSocketApiApiFutures(object):
             f"BinanceWebSocketApiApiFutures.get_account_position() - Created payload: {payload}"
         )
 
+        if process_response is not None:
+            with self._manager.process_response_lock:
+                entry = {"callback_function": process_response}
+                self._manager.process_response[request_id] = entry
+        if return_response is True:
+            self._manager._add_return_response_waiter(request_id=request_id)
+
         if (
             self._manager.send_with_stream(stream_id=stream_id, payload=payload)
             is False
         ):
             self._manager.add_payload_to_stream(stream_id=stream_id, payload=payload)
 
-        if process_response is not None:
-            with self._manager.process_response_lock:
-                entry = {"callback_function": process_response}
-                self._manager.process_response[request_id] = entry
-
         if return_response is True:
-            with self._manager.return_response_lock:
-                entry = {"event_return_response": threading.Event()}
-                self._manager.return_response[request_id] = entry
-            self._manager.return_response[request_id]["event_return_response"].wait()
-            with self._manager.return_response_lock:
-                response_value = self._manager.return_response[request_id][
-                    "response_value"
-                ]
-                del self._manager.return_response[request_id]
+            response_value = self._manager._wait_for_return_response(
+                request_id=request_id
+            )
             return response_value
 
         return True
@@ -1286,27 +1269,23 @@ class BinanceWebSocketApiApiFutures(object):
             f"BinanceWebSocketApiApiFutures.get_account_status() - Created payload: {payload}"
         )
 
+        if process_response is not None:
+            with self._manager.process_response_lock:
+                entry = {"callback_function": process_response}
+                self._manager.process_response[request_id] = entry
+        if return_response is True:
+            self._manager._add_return_response_waiter(request_id=request_id)
+
         if (
             self._manager.send_with_stream(stream_id=stream_id, payload=payload)
             is False
         ):
             self._manager.add_payload_to_stream(stream_id=stream_id, payload=payload)
 
-        if process_response is not None:
-            with self._manager.process_response_lock:
-                entry = {"callback_function": process_response}
-                self._manager.process_response[request_id] = entry
-
         if return_response is True:
-            with self._manager.return_response_lock:
-                entry = {"event_return_response": threading.Event()}
-                self._manager.return_response[request_id] = entry
-            self._manager.return_response[request_id]["event_return_response"].wait()
-            with self._manager.return_response_lock:
-                response_value = self._manager.return_response[request_id][
-                    "response_value"
-                ]
-                del self._manager.return_response[request_id]
+            response_value = self._manager._wait_for_return_response(
+                request_id=request_id
+            )
             return response_value
 
         return True
@@ -1403,27 +1382,23 @@ class BinanceWebSocketApiApiFutures(object):
             f"BinanceWebSocketApiApiFutures.get_listen_key() - Created payload: {payload}"
         )
 
+        if process_response is not None:
+            with self._manager.process_response_lock:
+                entry = {"callback_function": process_response}
+                self._manager.process_response[request_id] = entry
+        if return_response is True:
+            self._manager._add_return_response_waiter(request_id=request_id)
+
         if (
             self._manager.send_with_stream(stream_id=stream_id, payload=payload)
             is False
         ):
             self._manager.add_payload_to_stream(stream_id=stream_id, payload=payload)
 
-        if process_response is not None:
-            with self._manager.process_response_lock:
-                entry = {"callback_function": process_response}
-                self._manager.process_response[request_id] = entry
-
         if return_response is True:
-            with self._manager.return_response_lock:
-                entry = {"event_return_response": threading.Event()}
-                self._manager.return_response[request_id] = entry
-            self._manager.return_response[request_id]["event_return_response"].wait()
-            with self._manager.return_response_lock:
-                response_value = self._manager.return_response[request_id][
-                    "response_value"
-                ]
-                del self._manager.return_response[request_id]
+            response_value = self._manager._wait_for_return_response(
+                request_id=request_id
+            )
             return response_value
 
         return True
@@ -1588,27 +1563,23 @@ class BinanceWebSocketApiApiFutures(object):
             f"BinanceWebSocketApiApiFutures.get_order() - Created payload: {payload}"
         )
 
+        if process_response is not None:
+            with self._manager.process_response_lock:
+                entry = {"callback_function": process_response}
+                self._manager.process_response[request_id] = entry
+        if return_response is True:
+            self._manager._add_return_response_waiter(request_id=request_id)
+
         if (
             self._manager.send_with_stream(stream_id=stream_id, payload=payload)
             is False
         ):
             self._manager.add_payload_to_stream(stream_id=stream_id, payload=payload)
 
-        if process_response is not None:
-            with self._manager.process_response_lock:
-                entry = {"callback_function": process_response}
-                self._manager.process_response[request_id] = entry
-
         if return_response is True:
-            with self._manager.return_response_lock:
-                entry = {"event_return_response": threading.Event()}
-                self._manager.return_response[request_id] = entry
-            self._manager.return_response[request_id]["event_return_response"].wait()
-            with self._manager.return_response_lock:
-                response_value = self._manager.return_response[request_id][
-                    "response_value"
-                ]
-                del self._manager.return_response[request_id]
+            response_value = self._manager._wait_for_return_response(
+                request_id=request_id
+            )
             return response_value
 
         return True
@@ -1747,27 +1718,23 @@ class BinanceWebSocketApiApiFutures(object):
             f"BinanceWebSocketApiApiFutures.get_order_book() - Created payload: {payload}"
         )
 
+        if process_response is not None:
+            with self._manager.process_response_lock:
+                entry = {"callback_function": process_response}
+                self._manager.process_response[request_id] = entry
+        if return_response is True:
+            self._manager._add_return_response_waiter(request_id=request_id)
+
         if (
             self._manager.send_with_stream(stream_id=stream_id, payload=payload)
             is False
         ):
             self._manager.add_payload_to_stream(stream_id=stream_id, payload=payload)
 
-        if process_response is not None:
-            with self._manager.process_response_lock:
-                entry = {"callback_function": process_response}
-                self._manager.process_response[request_id] = entry
-
         if return_response is True:
-            with self._manager.return_response_lock:
-                entry = {"event_return_response": threading.Event()}
-                self._manager.return_response[request_id] = entry
-            self._manager.return_response[request_id]["event_return_response"].wait()
-            with self._manager.return_response_lock:
-                response_value = self._manager.return_response[request_id][
-                    "response_value"
-                ]
-                del self._manager.return_response[request_id]
+            response_value = self._manager._wait_for_return_response(
+                request_id=request_id
+            )
             return response_value
 
         return True
@@ -1858,27 +1825,23 @@ class BinanceWebSocketApiApiFutures(object):
             f"BinanceWebSocketApiApiFutures.get_server_time() - Created payload: {payload}"
         )
 
+        if process_response is not None:
+            with self._manager.process_response_lock:
+                entry = {"callback_function": process_response}
+                self._manager.process_response[request_id] = entry
+        if return_response is True:
+            self._manager._add_return_response_waiter(request_id=request_id)
+
         if (
             self._manager.send_with_stream(stream_id=stream_id, payload=payload)
             is False
         ):
             self._manager.add_payload_to_stream(stream_id=stream_id, payload=payload)
 
-        if process_response is not None:
-            with self._manager.process_response_lock:
-                entry = {"callback_function": process_response}
-                self._manager.process_response[request_id] = entry
-
         if return_response is True:
-            with self._manager.return_response_lock:
-                entry = {"event_return_response": threading.Event()}
-                self._manager.return_response[request_id] = entry
-            self._manager.return_response[request_id]["event_return_response"].wait()
-            with self._manager.return_response_lock:
-                response_value = self._manager.return_response[request_id][
-                    "response_value"
-                ]
-                del self._manager.return_response[request_id]
+            response_value = self._manager._wait_for_return_response(
+                request_id=request_id
+            )
             return response_value
 
         return True
@@ -2023,27 +1986,23 @@ class BinanceWebSocketApiApiFutures(object):
             f"BinanceWebSocketApiApiFutures.get_ticker_order_book() - Created payload: {payload}"
         )
 
+        if process_response is not None:
+            with self._manager.process_response_lock:
+                entry = {"callback_function": process_response}
+                self._manager.process_response[request_id] = entry
+        if return_response is True:
+            self._manager._add_return_response_waiter(request_id=request_id)
+
         if (
             self._manager.send_with_stream(stream_id=stream_id, payload=payload)
             is False
         ):
             self._manager.add_payload_to_stream(stream_id=stream_id, payload=payload)
 
-        if process_response is not None:
-            with self._manager.process_response_lock:
-                entry = {"callback_function": process_response}
-                self._manager.process_response[request_id] = entry
-
         if return_response is True:
-            with self._manager.return_response_lock:
-                entry = {"event_return_response": threading.Event()}
-                self._manager.return_response[request_id] = entry
-            self._manager.return_response[request_id]["event_return_response"].wait()
-            with self._manager.return_response_lock:
-                response_value = self._manager.return_response[request_id][
-                    "response_value"
-                ]
-                del self._manager.return_response[request_id]
+            response_value = self._manager._wait_for_return_response(
+                request_id=request_id
+            )
             return response_value
 
         return True
@@ -2179,27 +2138,23 @@ class BinanceWebSocketApiApiFutures(object):
             f"BinanceWebSocketApiApiFutures.get_ticker_price() - Created payload: {payload}"
         )
 
+        if process_response is not None:
+            with self._manager.process_response_lock:
+                entry = {"callback_function": process_response}
+                self._manager.process_response[request_id] = entry
+        if return_response is True:
+            self._manager._add_return_response_waiter(request_id=request_id)
+
         if (
             self._manager.send_with_stream(stream_id=stream_id, payload=payload)
             is False
         ):
             self._manager.add_payload_to_stream(stream_id=stream_id, payload=payload)
 
-        if process_response is not None:
-            with self._manager.process_response_lock:
-                entry = {"callback_function": process_response}
-                self._manager.process_response[request_id] = entry
-
         if return_response is True:
-            with self._manager.return_response_lock:
-                entry = {"event_return_response": threading.Event()}
-                self._manager.return_response[request_id] = entry
-            self._manager.return_response[request_id]["event_return_response"].wait()
-            with self._manager.return_response_lock:
-                response_value = self._manager.return_response[request_id][
-                    "response_value"
-                ]
-                del self._manager.return_response[request_id]
+            response_value = self._manager._wait_for_return_response(
+                request_id=request_id
+            )
             return response_value
 
         return True
@@ -2420,27 +2375,23 @@ class BinanceWebSocketApiApiFutures(object):
             f"BinanceWebSocketApiApiFutures.modify_order() - Created payload: {payload}"
         )
 
+        if process_response is not None:
+            with self._manager.process_response_lock:
+                entry = {"callback_function": process_response}
+                self._manager.process_response[request_id] = entry
+        if return_response is True:
+            self._manager._add_return_response_waiter(request_id=request_id)
+
         if (
             self._manager.send_with_stream(stream_id=stream_id, payload=payload)
             is False
         ):
             self._manager.add_payload_to_stream(stream_id=stream_id, payload=payload)
 
-        if process_response is not None:
-            with self._manager.process_response_lock:
-                entry = {"callback_function": process_response}
-                self._manager.process_response[request_id] = entry
-
         if return_response is True:
-            with self._manager.return_response_lock:
-                entry = {"event_return_response": threading.Event()}
-                self._manager.return_response[request_id] = entry
-            self._manager.return_response[request_id]["event_return_response"].wait()
-            with self._manager.return_response_lock:
-                response_value = self._manager.return_response[request_id][
-                    "response_value"
-                ]
-                del self._manager.return_response[request_id]
+            response_value = self._manager._wait_for_return_response(
+                request_id=request_id
+            )
             return response_value
 
         return True
@@ -2528,27 +2479,23 @@ class BinanceWebSocketApiApiFutures(object):
             f"BinanceWebSocketApiApiFutures.ping() - Created payload: {payload}"
         )
 
+        if process_response is not None:
+            with self._manager.process_response_lock:
+                entry = {"callback_function": process_response}
+                self._manager.process_response[request_id] = entry
+        if return_response is True:
+            self._manager._add_return_response_waiter(request_id=request_id)
+
         if (
             self._manager.send_with_stream(stream_id=stream_id, payload=payload)
             is False
         ):
             self._manager.add_payload_to_stream(stream_id=stream_id, payload=payload)
 
-        if process_response is not None:
-            with self._manager.process_response_lock:
-                entry = {"callback_function": process_response}
-                self._manager.process_response[request_id] = entry
-
         if return_response is True:
-            with self._manager.return_response_lock:
-                entry = {"event_return_response": threading.Event()}
-                self._manager.return_response[request_id] = entry
-            self._manager.return_response[request_id]["event_return_response"].wait()
-            with self._manager.return_response_lock:
-                response_value = self._manager.return_response[request_id][
-                    "response_value"
-                ]
-                del self._manager.return_response[request_id]
+            response_value = self._manager._wait_for_return_response(
+                request_id=request_id
+            )
             return response_value
 
         return True
