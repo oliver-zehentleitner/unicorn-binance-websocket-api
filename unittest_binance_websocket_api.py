@@ -2721,6 +2721,104 @@ class TestWebSocketLibrary(unittest.TestCase):
                     ubwa.stop_manager()
 
 
+class TestWsApiReturnResponse(unittest.TestCase):
+    """
+    WS API `return_response=True` against a local fake WS API server: matching the response, the timeout when
+    none arrives, and masked keys in `get_stream_info()`. Runs offline, no Binance keys needed.
+    """
+
+    @classmethod
+    def setUpClass(cls):
+        import websockets
+
+        print(f"\r\nTestWsApiReturnResponse:")
+        cls.answer = True
+
+        async def handler(websocket):
+            async for message in websocket:
+                request = orjson.loads(message)
+                if cls.answer is True:
+                    await websocket.send(
+                        orjson.dumps(
+                            {
+                                "id": request["id"],
+                                "status": 200,
+                                "result": {"serverTime": 123},
+                            }
+                        ).decode()
+                    )
+
+        with socket.socket() as sock:
+            sock.bind(("127.0.0.1", 0))
+            cls.port = sock.getsockname()[1]
+        cls.server_loop = asyncio.new_event_loop()
+
+        async def serve():
+            cls.server = await websockets.serve(handler, "127.0.0.1", cls.port)
+
+        cls.server_loop.run_until_complete(serve())
+        threading.Thread(target=cls.server_loop.run_forever, daemon=True).start()
+        cls.ubwa = BinanceWebSocketApiManager(
+            exchange="binance.com-testnet",
+            warn_on_update=False,
+            output_default="dict",
+            websocket_api_base_uri=f"ws://127.0.0.1:{cls.port}/",
+            ws_api_response_timeout=2,
+        )
+        cls.stream_id = cls.ubwa.create_stream(
+            api=True, api_key="ABCDEFGHIJKLMNOP", api_secret="SECRETSECRETSECRET"
+        )
+        cls.ubwa.wait_till_stream_has_started(stream_id=cls.stream_id, timeout=10)
+
+    @classmethod
+    def tearDownClass(cls):
+        cls.ubwa.stop_manager()
+
+        async def shutdown():
+            cls.server.close()
+            await cls.server.wait_closed()
+
+        asyncio.run_coroutine_threadsafe(shutdown(), cls.server_loop).result(timeout=10)
+        cls.server_loop.call_soon_threadsafe(cls.server_loop.stop)
+
+    def test_return_response_matched(self):
+        self.__class__.answer = True
+        response = self.ubwa.api.spot.get_server_time(
+            stream_id=self.stream_id, return_response=True
+        )
+        self.assertEqual(response["result"]["serverTime"], 123)
+        self.assertEqual(self.ubwa.return_response, {})
+
+    def test_return_response_timeout(self):
+        self.__class__.answer = False
+        try:
+            start = time.time()
+            with self.assertRaises(WebSocketApiResponseTimeout):
+                self.ubwa.api.spot.get_server_time(
+                    stream_id=self.stream_id, return_response=True
+                )
+            self.assertLess(time.time() - start, 5)
+            self.assertEqual(self.ubwa.return_response, {})
+        finally:
+            self.__class__.answer = True
+
+    def test_stream_info_masks_keys(self):
+        stream_info = self.ubwa.get_stream_info(stream_id=self.stream_id)
+        self.assertEqual(stream_info["api_key"], "ABCD**********OP")
+        self.assertEqual(stream_info["api_secret"], "SECR************ET")
+        # the stream itself keeps the real keys for signing
+        self.assertEqual(
+            self.ubwa.stream_list[self.stream_id]["api_key"], "ABCDEFGHIJKLMNOP"
+        )
+
+    def test_mask_secret(self):
+        self.assertEqual(BinanceWebSocketApiManager._mask_secret(None), None)
+        self.assertEqual(BinanceWebSocketApiManager._mask_secret(False), False)
+        self.assertEqual(BinanceWebSocketApiManager._mask_secret(""), "")
+        self.assertEqual(BinanceWebSocketApiManager._mask_secret("abc"), "***")
+        self.assertEqual(BinanceWebSocketApiManager._mask_secret("abcdefg"), "abcd*fg")
+
+
 if __name__ == "__main__":
     try:
         unittest.main()

@@ -93,6 +93,9 @@ ubwa.api.futures.create_order(symbol="BTCUSDT", side="BUY", order_type="MARKET",
                                quantity=0.01, stream_id=api_stream)
 ```
 
+`return_response=True` waits up to `ws_api_response_timeout` seconds (manager parameter, default `30.0`, `None` = no
+limit), then raises `WebSocketApiResponseTimeout`. `get_stream_info()` returns `api_key`/`api_secret` masked.
+
 ## Stream Signals
 
 Monitor stream lifecycle events:

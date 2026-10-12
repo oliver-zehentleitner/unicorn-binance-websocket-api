@@ -110,3 +110,16 @@ class UnknownExchange(Exception):
 
     def __init__(self, error_msg=None):
         super().__init__(error_msg)
+
+
+class WebSocketApiResponseTimeout(TimeoutError):
+    """
+    Raised by a WebSocket API request with `return_response=True` if no response arrived within
+    `ws_api_response_timeout` seconds.
+    """
+
+    def __init__(self, request_id=None, timeout=None):
+        self.request_id = request_id
+        self.timeout = timeout
+        self.message = f"No response to WebSocket API request with request_id={request_id} within {timeout} seconds!"
+        super().__init__(self.message)

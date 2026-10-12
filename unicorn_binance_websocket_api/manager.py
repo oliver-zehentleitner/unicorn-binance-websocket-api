@@ -256,6 +256,11 @@ class BinanceWebSocketApiManager(threading.Thread):
                               `pip install unicorn-binance-websocket-api[picows]`. Selecting `"picows"` without the
                               package installed raises an `ImportError`, an unknown value raises a `ValueError`.
     :type websocket_library: str
+    :param ws_api_response_timeout: Seconds a WebSocket API request with `return_response=True` waits for its
+                                    response before raising `WebSocketApiResponseTimeout`. `None` waits without
+                                    limit. A response that arrives after the timeout is no longer returned to the
+                                    caller and is handled like any other received data of the stream.
+    :type ws_api_response_timeout: float
     """
 
     def __init__(
@@ -290,6 +295,7 @@ class BinanceWebSocketApiManager(threading.Thread):
         ubra_manager: BinanceRestApiManager = None,
         websocket_library: Literal["websockets", "picows"] = "websockets",
         proxy: Optional[str] = None,
+        ws_api_response_timeout: Optional[float] = 30.0,
     ):
         threading.Thread.__init__(self)
         self.name = __app_name__
@@ -495,6 +501,7 @@ class BinanceWebSocketApiManager(threading.Thread):
         self.restart_timeout = restart_timeout
         self.return_response = {}
         self.return_response_lock = threading.Lock()
+        self.ws_api_response_timeout = ws_api_response_timeout
         self.ringbuffer_error = []
         self.ringbuffer_error_max_size = 500
         self.ringbuffer_result = []
@@ -3942,6 +3949,55 @@ class BinanceWebSocketApiManager(threading.Thread):
         else:
             return None
 
+    def _add_return_response_waiter(self, request_id=None) -> None:
+        """
+        Register a waiter for the response of a WebSocket API request. Must be called before the request is sent,
+        otherwise a fast response can arrive before the waiter exists and is not matched.
+
+        :param request_id: id of the WebSocket API request
+        :type request_id: str
+        :return: None
+        """
+        with self.return_response_lock:
+            self.return_response[request_id] = {
+                "event_return_response": threading.Event()
+            }
+
+    def _wait_for_return_response(self, request_id=None):
+        """
+        Wait for the response of a WebSocket API request registered with `_add_return_response_waiter()`.
+
+        :param request_id: id of the WebSocket API request
+        :type request_id: str
+        :return: the response
+        :raises WebSocketApiResponseTimeout: no response within `ws_api_response_timeout` seconds
+        """
+        with self.return_response_lock:
+            event = self.return_response[request_id]["event_return_response"]
+        if event.wait(timeout=self.ws_api_response_timeout) is False:
+            with self.return_response_lock:
+                self.return_response.pop(request_id, None)
+            raise WebSocketApiResponseTimeout(
+                request_id=request_id, timeout=self.ws_api_response_timeout
+            )
+        with self.return_response_lock:
+            return self.return_response.pop(request_id)["response_value"]
+
+    @staticmethod
+    def _mask_secret(secret=None):
+        """
+        Mask a secret for output: keep the first 4 and the last 2 characters, replace the rest with `*`.
+
+        :param secret: the secret to mask
+        :type secret: str
+        :return: str or the unchanged value if it is empty
+        """
+        if not secret or not isinstance(secret, str):
+            return secret
+        if len(secret) <= 6:
+            return "*" * len(secret)
+        return secret[:4] + "*" * (len(secret) - 6) + secret[-2:]
+
     def get_stream_info(self, stream_id):
         """
         Get all infos about a specific stream
@@ -3974,6 +4030,10 @@ class BinanceWebSocketApiManager(threading.Thread):
                 + ") Info: KeyError"
             )
             return False
+        temp_stream_list["api_key"] = self._mask_secret(temp_stream_list.get("api_key"))
+        temp_stream_list["api_secret"] = self._mask_secret(
+            temp_stream_list.get("api_secret")
+        )
         if temp_stream_list["last_heartbeat"] is not None:
             temp_stream_list["seconds_to_last_heartbeat"] = (
                 current_timestamp - self.stream_list[stream_id]["last_heartbeat"]

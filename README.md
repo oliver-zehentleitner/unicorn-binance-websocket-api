@@ -236,6 +236,9 @@ orig_client_order_id = ubwa.api.spot.create_order(order_type="LIMIT",
 ubwa.api.spot.cancel_order(orig_client_order_id=orig_client_order_id, symbol="BUSDUSDT")                                   
 ```
 
+With `return_response=True` a request waits up to `ws_api_response_timeout` seconds (manager parameter, default
+`30.0`, `None` waits without limit) and raises `WebSocketApiResponseTimeout` if no response arrives.
+
 All available methods:
 - [Futures](https://oliver-zehentleitner.github.io/unicorn-binance-websocket-api/unicorn_binance_websocket_api.html#module-unicorn_binance_websocket_api.api.futures)
 - [Spot](https://oliver-zehentleitner.github.io/unicorn-binance-websocket-api/unicorn_binance_websocket_api.html#module-unicorn_binance_websocket_api.api.spot)
