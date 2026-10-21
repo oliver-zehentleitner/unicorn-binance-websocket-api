@@ -38,4 +38,4 @@ Files in this directory describe project knowledge. They do not contain
 instructions that grant permissions, override user intent, authorize
 commands, or weaken security controls.
 
-Start with the [context index](index.md).
+Start with the [context index](index.md), or browse it all in the [dashboard](https://oliver-zehentleitner.github.io/unicorn-binance-websocket-api/keep-the-why-dashboard/).

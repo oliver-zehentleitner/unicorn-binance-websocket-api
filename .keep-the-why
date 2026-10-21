@@ -9,7 +9,7 @@ README, for what Keep the Why actually is.
 - dashboard-state: https://oliver-zehentleitner.github.io/unicorn-binance-websocket-api/keep-the-why-dashboard/state.json
 - context: `context/`
 - init: complete
-- context-schema: 0.20.2
+- context-schema: 0.20.3
 - capture-confirmation: automatic
 - source-reference: never
 <!-- /keep-the-why:config -->
